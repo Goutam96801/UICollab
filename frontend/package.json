@@ -1,0 +1,74 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@ai-sdk/google": "^1.0.12",
+    "@flaticon/flaticon-uicons": "^3.3.1",
+    "@monaco-editor/react": "^4.6.0",
+    "@radix-ui/react-label": "^2.1.1",
+    "@radix-ui/react-switch": "^1.1.2",
+    "@radix-ui/react-tabs": "^1.1.2",
+    "@react-three/drei": "^7.26.1",
+    "@react-three/fiber": "^8.17.10",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/three": "^0.171.0",
+    "ai": "^4.0.22",
+    "axios": "^1.7.7",
+    "curl": "^0.1.4",
+    "dotenv": "^16.4.5",
+    "firebase": "^10.14.1",
+    "framer-motion": "^11.11.9",
+    "lucide-react": "^0.453.0",
+    "monaco-editor": "^0.52.0",
+    "monaco-tailwindcss": "^0.6.1",
+    "monaco-vue": "^0.2.3",
+    "motion": "^11.13.5",
+    "openai": "^4.77.0",
+    "popmotion": "11.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-globe.gl": "^2.28.3",
+    "react-hot-toast": "^2.4.1",
+    "react-markdown": "^9.0.1",
+    "react-router-dom": "^6.27.0",
+    "react-scripts": "5.0.1",
+    "react-spinners": "^0.14.1",
+    "react-syntax-highlighter": "^15.6.1",
+    "react-top-loading-bar": "^2.3.1",
+    "remark-gfm": "^4.0.0",
+    "three": "^0.171.0",
+    "three-globe": "^2.37.1",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.14",
+    "vite": "^6.0.3"
+  }
+}

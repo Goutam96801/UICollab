@@ -1,0 +1,78 @@
+@import "@flaticon/flaticon-uicons/css/all/all";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 1s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .glow {
+    filter: drop-shadow(0 0 8px theme("colors.blue.400"));
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  
+}
+
+@layer components {
+  .input-box {
+    @apply w-[100%] rounded-md p-2 font-semibold pl-12 border border-gray-600 focus:bg-transparent;
+  }
+
+  input:disabled,
+  input:disabled {
+    @apply opacity-50;
+  }
+
+  .disabled {
+    @apply opacity-50 pointer-events-none;
+  }
+
+  .input-icon {
+    @apply absolute left-4 text-gray-900 top-1/2 -translate-y-1/2;
+  }
+
+  .active {
+    @apply text-orange-500;
+  }
+}

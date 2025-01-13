@@ -1,0 +1,42 @@
+{
+    "button": {
+        "html": "<button class=\"btn\">Click Me</button>",
+        "css": ".btn { background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; } .btn:hover { background-color: #0056b3; }"
+    },
+    "checkbox": {
+        "html": "<input type=\"checkbox\" id=\"checkbox\" class=\"checkbox\" /><label for=\"checkbox\">Checkbox</label>",
+        "css": ".checkbox { margin-right: 10px; }"
+    },
+    "toggle-switch": {
+        "html": "<label class=\"switch\"><input type=\"checkbox\"><span class=\"slider\"></span></label>",
+        "css": ".switch { position: relative; display: inline-block; width: 34px; height: 20px; } .switch input { opacity: 0; width: 0; height: 0; } .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 20px; } .slider:before { position: absolute; content: \"\"; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: 0.4s; } input:checked + .slider { background-color: #007bff; } input:checked + .slider:before { transform: translateX(14px); }"
+    },
+    "card": {
+        "html": "<div class=\"card\"><h3>Card Title</h3><p>Card content goes here...</p></div>",
+        "css": ".card { border: 1px solid #ccc; border-radius: 5px; padding: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); max-width: 300px; }"
+    },
+    "loader": {
+        "html": "<div class=\"loader\"></div>",
+        "css": ".loader { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #007bff; width: 40px; height: 40px; animation: spin 2s linear infinite; } @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }}"
+    },
+    "input": {
+        "html": "<input type=\"text\" placeholder=\"Enter text\" class=\"input\" />",
+        "css": ".input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 100%; max-width: 300px; }"
+    },
+    "radio-buttons": {
+        "html": "<div class=\"radio-input\"> <input type=\"radio\" id=\"value-1\" name=\"value-radio\" value=\"value-1\"> <input type=\"radio\" id=\"value-2\" name=\"value-radio\" value=\"value-2\"> <input type=\"radio\" id=\"value-3\" name=\"value-radio\" value=\"value-3\"> </div>",
+        "css": ".radio-input input {}"
+    },
+    "form": {
+        "html": "<form><label for=\"name\">Name:</label><input type=\"text\" id=\"name\" name=\"name\" /><button type=\"submit\">Submit</button></form>",
+        "css": "form { display: flex; flex-direction: column; gap: 10px; max-width: 300px; } input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; } button { background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; } button:hover { background-color: #0056b3; }"
+    },
+    "pattern": {
+        "html": "<div class=\"pattern\">Pattern content</div>",
+        "css": ".pattern { background: repeating-linear-gradient(45deg, #007bff, #007bff 10px, #ccc 10px, #ccc 20px); padding: 20px; border-radius: 5px; }"
+    },
+    "tooltips": {
+        "html": "<div class=\"tooltip-container\"> <span class=\"tooltip\">Uiverse.io</span><span class=\"text\">Tooltip</span></div>",
+        "css": ".tooltip-container {--background: #22d3ee; position: relative; background: var(--background); cursor: pointer; transition: all 0.2s; font-size: 17px; padding: 0.7em 1.8em;} .tooltip { position: absolute; top: 0; left: 50%; transform: translateX(-50%); padding: 0.3em 0.6em; opacity: 0; pointer-events: none; transition: all 0.3s; background: var(--background); } .tooltip::before { position: absolute; content: \"\"; height: 0.6em; width: 0.6em; bottom: -0.2em; left: 50%; transform: translate(-50%) rotate(45deg); background: var(--background); } .tooltip-container:hover .tooltip { top: -100%; opacity: 1; visibility: visible; pointer-events: auto;}"
+    }
+}
