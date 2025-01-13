@@ -4,9 +4,7 @@ import {
   ChevronDown,
   UserRound,
   BookMarked,
-  MessageCircle,
   LogOut,
-  Bolt,
   X,
   Menu,
   User,
@@ -27,7 +25,7 @@ import ContributorPoint from "./contributor-point";
 import AnimationWrapper from "../../common/page-animation";
 import Notifications from "./notification";
 import axios from "axios";
-
+import * as LucidIcons from "lucide-react";
 
 const itemVariants = {
   open: {
@@ -38,24 +36,7 @@ const itemVariants = {
   closed: { opacity: 0, y: 20, transition: { duration: 0.2 } },
 };
 
-const categories = [
-  "browse all",
-  "buttons",
-  "checkboxes",
-  "toggle switches",
-  "cards",
-  "loaders",
-  "inputs",
-  "radio buttons",
-  "forms",
-  "patterns",
-  "AudioWaveform",
-  "tooltips",
-  "my favourites",
-];
-
 function NavbarComponent() {
-  const [isHover, setIsHover] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
@@ -66,46 +47,83 @@ function NavbarComponent() {
   const [contributor, setContributor] = useState(false);
   const [isCreate, setIsCreate] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Update 1
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
   const dropdownRef = useRef(null);
   const contributorRef = useRef(null);
   const notificationRef = useRef(null);
   const menuRef = useRef(null);
   const menuButtonRef = useRef(null);
   const {
-    userAuth: { access_token, username, profile_img, contributor_points, fullname },
+    userAuth: {
+      access_token,
+      username,
+      profile_img,
+      contributor_points,
+      fullname,
+    },
     setUserAuth,
   } = useContext(UserContext);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleClickOutside = (event) => {
-      if (
-        notificationOpen &&
-        notificationRef.current &&
-        !notificationRef.current.contains(event.target)
-      ) {
-        setNotificationOpen(false);
-      }
+  console.log(authOpen)
 
-      if (
-        isMenuOpen &&
-        menuRef.current &&
-        !menuRef.current.contains(event.target) &&
-        !menuButtonRef.current.contains(event.target)
-      ) {
-        setIsMenuOpen(false);
-      }
+  const handleClickOutside = (event) => {
+    if (
+      notificationOpen &&
+      notificationRef.current &&
+      !notificationRef.current.contains(event.target)
+    ) {
+      setNotificationOpen(false);
+    }
+
+    if (
+      isMenuOpen &&
+      menuRef.current &&
+      !menuRef.current.contains(event.target) &&
+      !menuButtonRef.current.contains(event.target)
+    ) {
+      setIsMenuOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
     };
-  
-    useEffect(() => {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }, [notificationOpen, isMenuOpen]);
+  }, [notificationOpen, isMenuOpen]);
 
   const isActive = (path) => location.pathname === path;
+
+  const getIconComponent = (name) => {
+    // Dynamically find the component from imported icons
+    const IconComponent = LucidIcons[name];
+    return IconComponent ? <IconComponent size={20} /> : null;
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const { data } = await axios.post(
+        process.env.REACT_APP_SERVER_DOMAIN + "/get-categories"
+      );
+
+      const updatedCategories = [
+        { name: "All", icon: "List", post: [] },
+        ...data.category,
+        { name: "My Favourites", icon: "Star", post: [] },
+      ];
+      setCategories(updatedCategories);
+      // setCategories(data.category); // Save the categories in state
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const fetchNotificationCount = async () => {
@@ -199,7 +217,9 @@ function NavbarComponent() {
           <div className="hidden md:flex space-x-2 font-semibold text-[16px] ">
             <motion.div
               className={`relative overflow-visible flex items-center rounded-full justify-center cursor-pointer px-4 py-2.5 ${
-                isActive("/elements") ? " drop-shadow-sm shadow-sm shadow-teal-400 " : ""
+                isActive("/elements")
+                  ? " drop-shadow-sm shadow-sm shadow-teal-400 "
+                  : ""
               }`}
               onMouseEnter={() => setDropdown(true)}
               onMouseLeave={() => setDropdown(false)}
@@ -207,9 +227,12 @@ function NavbarComponent() {
               whileHover={{ scale: 1.1 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <Link to={"/elements"} className="bg-clip-text text-transparent text-center bg-gradient-to-tr from-purple-400 to-teal-400 flex items-center">
-              Elements <ChevronDown className="ml-1 h-4 w-4 text-teal-400" />
-              {dropdown && <CategoryDropdown />}
+              <Link
+                to={"/elements"}
+                className="bg-clip-text text-transparent text-center bg-gradient-to-tr from-purple-400 to-teal-400 flex items-center"
+              >
+                Elements <ChevronDown className="ml-1 h-4 w-4 text-teal-400" />
+                {dropdown && <CategoryDropdown />}
               </Link>
             </motion.div>
             <motion.button
@@ -217,7 +240,9 @@ function NavbarComponent() {
               whileTap={{ scale: 0.9 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
               className={`rounded-full px-4 py-2.5 bg-clip-text text-transparent bg-gradient-to-tr from-purple-400 to-teal-400  ${
-                isActive("/feature") ? " drop-shadow-sm shadow-sm shadow-teal-400 " : ""
+                isActive("/feature")
+                  ? " drop-shadow-sm shadow-sm shadow-teal-400 "
+                  : ""
               }`}
               onClick={() => handleLinkClick("/feature")}
             >
@@ -228,7 +253,9 @@ function NavbarComponent() {
               whileTap={{ scale: 0.9 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
               className={`rounded-full px-4 py-2.5 bg-clip-text text-transparent bg-gradient-to-tr from-purple-400 to-teal-400  ${
-                isActive("/blog") ? "drop-shadow-sm shadow-sm shadow-teal-400 " : ""
+                isActive("/blog")
+                  ? "drop-shadow-sm shadow-sm shadow-teal-400 "
+                  : ""
               }`}
               onClick={() => handleLinkClick("/blog")}
             >
@@ -292,7 +319,11 @@ function NavbarComponent() {
 
           <motion.button
             onClick={() => {
-              handleLinkClick("/create");
+              if (!access_token) {
+                setAuthOpen(true);
+              } else {
+                handleLinkClick("/create");
+              }
             }}
             className="flex items-center justify-center px-6 py-2.5 bg-gradient-to-r from-purple-400 to-teal-400 text-white rounded-full"
             whileHover={{ scale: 1.1 }}
@@ -307,27 +338,12 @@ function NavbarComponent() {
             >
               Create
             </motion.span>
-            {/* <motion.span
-              initial={false}
-              animate={{ opacity: isCreate ? 1 : 0, y: isCreate ? 0 : -10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute"
-            >
-              Cancel
-            </motion.span>
-            <motion.div
-              initial={false}
-              animate={{ rotate: isCreate ? 45 : 0 }}
-              transition={{ duration: 0.2 }}
-              className="ml-2"
-            >
-              {isCreate ? <X size={20} /> : <Plus size={20} />}
-            </motion.div> */}
+
             <Plus size={20} />
           </motion.button>
           {!access_token ? (
             <button
-              onClick={() => setAuthOpen(true)}
+              onClick={() => setAuthOpen(!authOpen)}
               className="bg-[#212121] px-4 py-2.5 font-bold rounded-full"
             >
               Sign In or Create Account
@@ -366,7 +382,7 @@ function NavbarComponent() {
                 />
               </motion.button>
               <motion.ul
-              ref={menuRef}
+                ref={menuRef}
                 className="rounded-lg absolute top-[45px] -right-2 z-50 p-1 shadow-xl bg-[#212121] border-2 border-[#212121] transition-all duration-500 translate-y-[5px]"
                 variants={{
                   open: {
@@ -394,7 +410,9 @@ function NavbarComponent() {
                   <button
                     className="hover:text-gray-100 px-5 pl-3 py-2.5 flex items-center justify-start cursor-pointer w-full text-center text-sm font-medium rounded-[6px] text-gray-300"
                     onClick={() => {
-                      handleLinkClick(`/profile/${username}`); setIsMenuOpen(false);}}
+                      handleLinkClick(`/profile/${username}`);
+                      setIsMenuOpen(false);
+                    }}
                   >
                     <UserRound className="w-5 h-5 mr-2" />
                     <span className="whitespace-nowrap">Your Profile</span>
@@ -403,7 +421,10 @@ function NavbarComponent() {
                 <motion.li variants={itemVariants} whileHover={{ scale: 1.1 }}>
                   <button
                     className="hover:text-gray-100 px-5 pl-3 py-2.5 flex items-center justify-start border-none cursor-pointer w-full text-center text-sm font-medium m-0 whitespace-nowrap rounded-[6px] text-gray-300"
-                    onClick={() => {handleLinkClick("/favorites"); setIsMenuOpen(false)}}
+                    onClick={() => {
+                      handleLinkClick("/favorites");
+                      setIsMenuOpen(false);
+                    }}
                   >
                     <BookMarked className="h-[18px] w-[18px] mr-2" />
                     <span className="whitespace-nowrap">Your Favorites</span>
@@ -467,14 +488,12 @@ function NavbarComponent() {
           open: { opacity: 1, x: 0 },
           closed: { opacity: 0, x: "100%" },
         }}
-        className={`fixed inset-0 z-40 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMjEyMTIxIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMzMTMxMzEiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=')] opacity-20 transform transition-transform duration-300 ease-in-out',
+        className={`fixed inset-0 z-[45] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMjEyMTIxIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMzMTMxMzEiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=')] opacity-20 transform transition-transform duration-300 ease-in-out',
           ${mobile ? "translate-x-0" : "translate-x-full"} 
         `}
       >
         <div
-          className={`fixed inset-0 top-[60px] w-screen h-[calc(100vh-64px)] overflow-y-auto z-40 ${
-            isActive("/feature") ? " bg-gray-900 bg-opacity-50 " : ""
-          }`}
+          className={`fixed inset-0 top-[60px] w-full h-[calc(100vh-64px)] overflow-y-auto z-40`}
         >
           {" "}
           {/* Update 4 */}
@@ -492,10 +511,16 @@ function NavbarComponent() {
               {categoryShow && (
                 <AnimationWrapper transition={0.5}>
                   <div className="py-4 pt-2 pl-6 text-gray-300">
-                    {categories.map((name, index) => (
+                    {categories.map(({ name, icon }, index) => (
                       <Link
                         key={index}
-                        to={`/${name === "browse all" ? "elements" : name}`}
+                        to={`/${
+                          name === "All"
+                            ? "elements"
+                            : name === "Favourites"
+                            ? "my favourites"
+                            : name.toLowerCase()
+                        }`}
                         className={`text-gray-400 flex items-center py-2 px-3 rounded-lg capitalize ${
                           isActive(`/${name}`) ? "bg-[#212121]" : ""
                         }`}
@@ -515,16 +540,18 @@ function NavbarComponent() {
                 Challenges
               </Link>
               <Link
-                className={`text-gray-100 flex items-center py-2 px-3 rounded-lg ${
-                  isActive("/feature") ? "bg-gray-800 bg-opacity-50" : ""
+                className={`text-gray-400 flex items-center py-2 px-3 rounded-lg ${
+                  isActive("/feature") ? "bg-[#212121]" : ""
                 }`}
                 onClick={() => handleLinkClick("/feature")}
               >
                 Feature
               </Link>
               <Link
-                className="text-gray-400 flex items-center py-2 px-3 rounded-lg"
-                onClick={() => handleLinkClick("/blogs")}
+                className={`text-gray-400 flex items-center py-2 px-3 rounded-lg ${
+                  isActive("/blog") ? "bg-[#212121]" : ""
+                }`}
+                onClick={() => handleLinkClick("/blog")}
               >
                 Blog
               </Link>
@@ -604,7 +631,7 @@ function NavbarComponent() {
                 <button
                   className="px-4 py-2.5 font-sans flex items-center gap-2 w-full border-none rounded-lg text-base font-semibold transition-colors duration-200 bg-[#212121] hover:bg-[#2e2e2e] text-offwhite cursor-pointer h-[42px]"
                   data-discover="true"
-                  onClick={() => setAuthOpen(true)}
+                  onClick={() => setAuthOpen(!authOpen)}
                 >
                   Sign in or Create Account
                 </button>
@@ -614,13 +641,8 @@ function NavbarComponent() {
         </div>
       </motion.div>
 
+      {isCreate && access_token && <ElementSelection />}
       {authOpen && <UserAuthentication handleCloseBtn={handleCloseBtn} />}
-      {isCreate &&
-        (access_token ? (
-          <ElementSelection />
-        ) : (
-          <UserAuthentication handleCloseBtn={handleCloseBtn} />
-        ))}
       <Outlet />
     </>
   );
