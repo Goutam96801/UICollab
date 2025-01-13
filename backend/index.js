@@ -4,7 +4,6 @@ import cors from 'cors';
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 import admin from 'firebase-admin';
-// import serviceAccountKey from './uination-firebase-adminsdk-4h164-5955af4d35.json' assert {type: "json"};
 import { getAuth } from 'firebase-admin/auth';
 import User from './model/User.js';
 import Post from './model/Post.js';
