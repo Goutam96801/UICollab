@@ -50,9 +50,6 @@ export default function AddCategory(props) {
   }, [chatHistory]);
 
   const handleSubmit = async (e) => {
-
-    
-    console.log(postData.name);
     e.preventDefault();
     props.setProgress(70);
     e.target.classList.add("disabled");

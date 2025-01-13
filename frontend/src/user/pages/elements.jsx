@@ -69,7 +69,6 @@ export default function Elements(props) {
         })
         .then(({ data }) => {
           props.setProgress(100);
-          console.log(data);
           setPosts(data.posts);
         })
         .catch((err) => {

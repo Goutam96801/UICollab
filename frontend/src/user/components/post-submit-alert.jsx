@@ -32,8 +32,6 @@ function PostSubmitAlert({
     setTitle(e.target.value);
   };
 
-  console.log(title);
-
   const handleTitleKeyDown = (e) => {
     if (e.keyCode == 13) {
       //enter key

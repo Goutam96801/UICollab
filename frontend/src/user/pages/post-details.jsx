@@ -216,7 +216,6 @@ function PostDetails(props) {
 
   const copyToClipboard = () => {
     if (editorRef.current) {
-      console.log("click");
       const code = editorRef.current.getValue();
       navigator.clipboard
         .writeText(code)

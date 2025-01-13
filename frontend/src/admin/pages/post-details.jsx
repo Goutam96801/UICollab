@@ -77,7 +77,6 @@ function AdminPostDetails(props) {
         }
       )
       .then(({ data }) => {
-        console.log(data)
         setPost(data.result);
         setLoading(false);
       })

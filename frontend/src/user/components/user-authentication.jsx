@@ -33,7 +33,6 @@ export default function UserAuthentication({handleCloseBtn}) {
       await axios.post(process.env.REACT_APP_SERVER_DOMAIN + '/google-auth', formData).then(({data}) => {
         storeInSession("user", JSON.stringify(data));
         setUserAuth(data);
-        console.log(data)
       })
       .catch(({ response }) => {
         const errorMessage = response?.data?.error || "An error occurred";
