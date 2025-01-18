@@ -1,7 +1,6 @@
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import GridLoader from "react-spinners/GridLoader";
 import { Settings, LogOut } from "lucide-react";
 import { UserContext } from "../../App";
 import ProfileDetails from "../components/profile-details";
@@ -9,6 +8,8 @@ import ProfileEdit from "../components/profile-edit";
 import { Toaster } from "react-hot-toast";
 import AnimationWrapper from "../../common/page-animation";
 import LoadingBar from "react-top-loading-bar";
+import { removeFromSession } from "../../common/session";
+import Loader from "../../ui/loader";
 
 export const profileDataStructure = {
   personal_info: {
@@ -43,6 +44,7 @@ function ProfilePage() {
 
   let {
     userAuth: { username },
+    setUserAuth,
   } = useContext(UserContext);
 
   const fetchUserProfile = () => {
@@ -74,6 +76,15 @@ function ProfilePage() {
     setOpenEditProfile(false);
   };
 
+  const handleLogout = () => {
+    setProgress(70);
+    setTimeout(() => {
+      setProgress(100);
+      removeFromSession("user");
+      setUserAuth({ access_token: null });
+    }, 1000);
+  };
+
   return (
     <AnimationWrapper>
       <Toaster />
@@ -84,14 +95,9 @@ function ProfilePage() {
         className="z-50"
       />
       {loading ? (
-        <GridLoader
-          color="indigo"
-          loading={loading}
-          size={30}
-          aria-label="Loading Spinner"
-          data-testid="loader"
-          className="absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]"
-        />
+        <div className="mt-10">
+        <Loader size={60} />
+        </div>
       ) : (
         <div>
           <div className="min-h-screen bg-transparent text-white p-6">
@@ -121,7 +127,10 @@ function ProfilePage() {
                           <Settings className="w-4 h-4 mr-2" />
                           Edit profile
                         </button>
-                        <button className="px-3 py-1 text-sm text-zinc-400 border border-zinc-700 rounded-md flex items-center hover:bg-zinc-800">
+                        <button
+                          onClick={handleLogout}
+                          className="px-3 py-1 text-sm text-zinc-400 border border-zinc-700 rounded-md flex items-center hover:bg-zinc-800"
+                        >
                           <LogOut className="w-4 h-4 mr-2" />
                           Log out
                         </button>

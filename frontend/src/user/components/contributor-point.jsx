@@ -8,12 +8,12 @@ export default function ContributorPoint() {
         {/* Header */}
         <div className="flex items-center gap-2 w-full justify-center">
           <BadgeCent color="teal" />
-          <h2 className="text-lg font-semibold">DevCoins</h2>
+          <h2 className="text-lg font-semibold">CollabCoins</h2>
         </div>
 
         {/* Description */}
         <p className="text-[#A1A1AA] text-sm text-center leading-relaxed">
-          Redeem our products for free using DevCoins.
+          Redeem our products for free using CollabCoins.
         </p>
 
         {/* Points Section */}

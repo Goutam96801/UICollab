@@ -12,6 +12,10 @@ import Comment from './model/comment.js';
 import Notification from './model/notification.js';
 import { nanoid } from 'nanoid';
 import Category from './model/category.js';
+import axios from "axios";
+import { Octokit } from "@octokit/rest";
+import category from './model/category.js';
+
 
 const serviceAccountKey = {
     "type": "service_account",
@@ -26,6 +30,16 @@ const serviceAccountKey = {
     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-4h164%40uination.iam.gserviceaccount.com",
     "universe_domain": "googleapis.com"
 }
+
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_OWNER = process.env.GITHUB_OWNER;
+const GITHUB_REPO = process.env.GITHUB_REPO;
+const GITHUB_BRANCH = "main";
+
+const headers = {
+    Authorization: `token ${GITHUB_TOKEN}`,
+    Accept: "application/vnd.github.v3+json",
+};
 
 
 const app = express();
@@ -309,7 +323,7 @@ app.post("/top-post-from-last-week", async (req, res) => {
             "activity.total_views": -1,
             "activity.total_comments": -1,
             publishedAt: -1
-        }).select("postId htmlCode cssCode category tags activity.total_views activity.total_saves activity.total_comments theme createdAt _id")
+        }).select("title postId htmlCode cssCode category tailwindCSS backgroundColor tags activity.total_views activity.total_saves activity.total_comments theme createdAt _id")
         .limit(15).then((posts) => {
             return res.status(200).json({ posts });
         }).catch((err) => {
@@ -369,7 +383,7 @@ app.post('/user-post', async (req, res) => {
 })
 
 app.post('/explore-post', async (req, res) => {
-    let { query, category, page, limit, theme, sort } = req.body;
+    let { query, category, page, limit, theme, sort, tailwindCSS } = req.body;
     let findQuery = { status: 'published' };
 
 
@@ -380,6 +394,12 @@ app.post('/explore-post', async (req, res) => {
     if (theme && theme != "any") {
         findQuery.theme = theme;
     }
+
+    if (tailwindCSS == true || tailwindCSS == false) {
+        findQuery.tailwindCSS = tailwindCSS
+    }
+
+
 
     // Construct additional search criteria
     if (query) {
@@ -411,7 +431,7 @@ app.post('/explore-post', async (req, res) => {
     Post.find(findQuery)
         .populate('author', 'personal_info.username personal_info.profile_img -_id')
         .sort({ [querySort]: -1 })
-        .select('postId htmlCode cssCode category tags activity.total_views activity.total_saves activity.total_comments theme createdAt _id')
+        .select('postId title htmlCode cssCode category tailwindCSS backgroundColor tags activity.total_views activity.total_saves activity.total_comments theme createdAt _id')
         .skip((page - 1) * maxLimit)
         .limit(maxLimit)
         .then(posts => {
@@ -483,6 +503,23 @@ app.post('/get-post', async (req, res) => {
             return res.status(500).json(err);
         })
 })
+
+app.post('/favourite-post', verifyJWT, async (req, res) => {
+    const userId = req.user;
+    
+    Post.find({ user_saved: userId }).populate('author', 'personal_info.username personal_info.profile_img -_id')
+        .select('postId title htmlCode cssCode category tailwindCSS backgroundColor tags activity.total_views activity.total_saves activity.total_comments theme createdAt _id')
+        .then(posts => {
+            if (!posts) {
+                return res.status(404).json({ message: "No posts found for this user." });
+            }
+            return res.status(200).json({ posts });
+        })
+        .catch(err => {
+            return res.status(500).json({ error: err.message });
+        });
+});
+
 
 app.post('/delete-post', verifyJWT, (req, res) => {
     let userId = req.user;
@@ -1005,6 +1042,68 @@ app.post('/admin/get-post', verifyJWT, async (req, res) => {
         })
 })
 
+const pushFileToGitHub = async (category, title, htmlCode, cssCode) => {
+    const octokit = new Octokit({ auth: GITHUB_TOKEN });
+
+    // Construct the file path
+    const filePath = `${category}/${title}.html`; // Example: "input/Magnifying input.html"
+
+    // Combine HTML and CSS content
+    const cssBlock = cssCode ? `<style>\n${cssCode}\n</style>\n` : "";
+    const combinedContent = `${cssBlock}${htmlCode}`;
+    const fileContent = Buffer.from(combinedContent).toString("base64"); // Base64 encoding
+
+    try {
+        // Check if the file exists
+        const { data } = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+            owner: GITHUB_OWNER,
+            repo: GITHUB_REPO,
+            path: filePath,
+            ref: GITHUB_BRANCH,
+        });
+
+        console.log("File exists. Updating with SHA:", data.sha);
+
+        // Update the file
+        await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
+            owner: GITHUB_OWNER,
+            repo: GITHUB_REPO,
+            path: filePath,
+            message: `Updated ${title} in ${category}`,
+            committer: {
+                name: "Your Name",
+                email: "your.email@example.com",
+            },
+            content: fileContent,
+            sha: data.sha,
+        });
+
+        console.log("File updated successfully.");
+    } catch (err) {
+        if (err.status === 404) {
+            console.log("File or folder does not exist. Attempting to create file...");
+
+            // Create the new file
+            await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
+                owner: GITHUB_OWNER,
+                repo: GITHUB_REPO,
+                path: filePath,
+                message: `Added ${title} to ${category}`,
+                committer: {
+                    name: "Your Name",
+                    email: "your.email@example.com",
+                },
+                content: fileContent,
+            });
+
+            console.log("File created successfully.");
+        } else {
+            console.error("Error:", err.message);
+            throw new Error("Failed to push file to GitHub");
+        }
+    }
+};
+
 app.post('/admin/update-post', verifyJWT, async (req, res) => {
 
 
@@ -1042,6 +1141,11 @@ app.post('/admin/update-post', verifyJWT, async (req, res) => {
             admin.post_published.push(post._id);
             user.account_info.total_posts += 1;
             user.account_info.contributor_points += 100;
+
+
+            await pushFileToGitHub(post.category, post.title, post.htmlCode, post.cssCode);
+
+
         } else if (status === 'rejected') {
             admin.account_info.total_post_rejected += 1;
             admin.post_rejected.push(post._id);

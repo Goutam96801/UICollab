@@ -20,7 +20,8 @@ import AllUserShown from './admin/pages/user.page';
 import LoadingBar from 'react-top-loading-bar';
 import AddCategory from './admin/components/add-category';
 import BlogComingSoon from './user/pages/blog-page';
-// import ElementsFilteredByTag from './user/pages/elements-by-tag';
+import Store from './user/pages/store';
+import MyFavourite from './user/pages/my-favourite';
 
 export const UserContext = createContext({});
 export const AdminContext = createContext({});
@@ -54,8 +55,10 @@ function App() {
             <Route path={'/:category'} element={<Elements setProgress={setProgress} />} />
             <Route path='/tags/:tag' element={<Elements setProgress={setProgress} />} />
             <Route path='/:username/:postId' element={<PostDetails setProgress={setProgress} />} />
-            <Route path='/feature' element={<Feature setProgress={setProgress} />} />
+            <Route path='/limelight' element={<Feature setProgress={setProgress} />} />
             <Route path='/blog' element={<BlogComingSoon />} />
+            <Route path='/my favourites' element={<MyFavourite setProgress={setProgress}/>}/>
+            <Route path='/store' element={<Store setProgress={setProgress} />} />
           </Route>
           <Route path='/admin-auth' element={<AdminHome setProgress={setProgress} />} />
           <Route path='/admin/' element={<AdminSidebar setProgress={setProgress} />}>

@@ -47,7 +47,7 @@ export const postDataStructure = {
   title: "",
   createdAt: "",
   cssCode: "",
-  tailwindCss: false,
+  tailwindCSS: false,
   theme: "",
   htmlCode: "",
   postId: "",
@@ -88,7 +88,7 @@ function PostDetails(props) {
     category,
     title,
     htmlCode,
-    tailwindCss,
+    tailwindCSS,
     backgroundColor: bgColor,
     cssCode,
     activity: {
@@ -132,6 +132,8 @@ function PostDetails(props) {
         setLoading(false);
       });
   };
+
+  console.log(post)
 
   const fetchLoggedUser = async () => {
     if (access_token) {
@@ -379,7 +381,7 @@ function PostDetails(props) {
                 toggleDarkMode={toggleDarkMode}
                 htmlCode={htmlCode}
                 cssCode={cssCode}
-                useTailwind={tailwindCss}
+                useTailwind={tailwindCSS}
                 setBackgroundColor={setBackgroundColor}
               />
 
@@ -387,7 +389,7 @@ function PostDetails(props) {
                 <EditorTabs
                   activeTab={activeTab}
                   setActiveTab={setActiveTab}
-                  useTailwind={tailwindCss}
+                  useTailwind={tailwindCSS}
                 />
                 <div className="w-full h-[calc(100vh-12.3rem)] border relative border-[#212121] pt-2 rounded-b-lg rounded-r-lg overflow-hidden bg-[#71717111]">
                   <MonacoEditor
@@ -706,7 +708,7 @@ function PostDetails(props) {
                         key={index}
                         className="hover:underline underline-offset-2 text-blue-400"
                         data-discover="true"
-                        href="/tags/gradient"
+                        href={`/tags/${tag}`}
                       >
                         {tag}
                       </a>

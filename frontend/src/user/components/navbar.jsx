@@ -4,7 +4,9 @@ import {
   ChevronDown,
   UserRound,
   BookMarked,
+  MessageCircle,
   LogOut,
+  Bolt,
   X,
   Menu,
   User,
@@ -25,7 +27,6 @@ import ContributorPoint from "./contributor-point";
 import AnimationWrapper from "../../common/page-animation";
 import Notifications from "./notification";
 import axios from "axios";
-import * as LucidIcons from "lucide-react";
 
 const itemVariants = {
   open: {
@@ -37,18 +38,19 @@ const itemVariants = {
 };
 
 function NavbarComponent() {
+  const [isHover, setIsHover] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [totalNotifications, setTotalNotifications] = useState(null);
   const [categoryShow, setCategoryShow] = useState(false);
+  const [categories, setCategories] = useState([]);
   const [mobile, setMobile] = useState(false);
   const [dropdown, setDropdown] = useState(false);
   const [contributor, setContributor] = useState(false);
   const [isCreate, setIsCreate] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [categories, setCategories] = useState([]);
   const dropdownRef = useRef(null);
   const contributorRef = useRef(null);
   const notificationRef = useRef(null);
@@ -67,17 +69,36 @@ function NavbarComponent() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  console.log(authOpen)
+
+  const fetchCategories = async () => {
+    try {
+      const { data } = await axios.post(
+        process.env.REACT_APP_SERVER_DOMAIN + "/get-categories"
+      );
+
+      const updatedCategories = [
+        { name: "All", icon: "List", post: [] },
+        ...data.category,
+        { name: "My Favourites", icon: "Star", post: [] },
+      ];
+      setCategories(updatedCategories);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    }
+  };
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const handleClickOutside = (event) => {
     if (
       notificationOpen &&
       notificationRef.current &&
-      !notificationRef.current.contains(event.target)
+      !notificationRef.current.contains(event.target) &&
+      !event.target.closest('button[aria-label="Toggle notifications"]')
     ) {
       setNotificationOpen(false);
     }
-
     if (
       isMenuOpen &&
       menuRef.current &&
@@ -96,34 +117,6 @@ function NavbarComponent() {
   }, [notificationOpen, isMenuOpen]);
 
   const isActive = (path) => location.pathname === path;
-
-  const getIconComponent = (name) => {
-    // Dynamically find the component from imported icons
-    const IconComponent = LucidIcons[name];
-    return IconComponent ? <IconComponent size={20} /> : null;
-  };
-
-  const fetchCategories = async () => {
-    try {
-      const { data } = await axios.post(
-        process.env.REACT_APP_SERVER_DOMAIN + "/get-categories"
-      );
-
-      const updatedCategories = [
-        { name: "All", icon: "List", post: [] },
-        ...data.category,
-        { name: "My Favourites", icon: "Star", post: [] },
-      ];
-      setCategories(updatedCategories);
-      // setCategories(data.category); // Save the categories in state
-    } catch (err) {
-      console.error("Error fetching categories:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
 
   useEffect(() => {
     const fetchNotificationCount = async () => {
@@ -161,12 +154,11 @@ function NavbarComponent() {
 
   useEffect(() => {
     if (authOpen || isMobileMenuOpen) {
-      // Update 2
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
     }
-  }, [authOpen, isMobileMenuOpen]); // Update 2
+  }, [authOpen, isMobileMenuOpen]);
 
   const handleCloseBtn = () => {
     setAuthOpen(false);
@@ -240,13 +232,13 @@ function NavbarComponent() {
               whileTap={{ scale: 0.9 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
               className={`rounded-full px-4 py-2.5 bg-clip-text text-transparent bg-gradient-to-tr from-purple-400 to-teal-400  ${
-                isActive("/feature")
+                isActive("/limelight")
                   ? " drop-shadow-sm shadow-sm shadow-teal-400 "
                   : ""
               }`}
-              onClick={() => handleLinkClick("/feature")}
+              onClick={() => handleLinkClick("/limelight")}
             >
-              Feature
+              Limelight
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.1, backgroundColor: "#212121" }}
@@ -259,7 +251,7 @@ function NavbarComponent() {
               }`}
               onClick={() => handleLinkClick("/blog")}
             >
-              Blogs
+              Blog
             </motion.button>
           </div>
         </motion.div>
@@ -272,10 +264,11 @@ function NavbarComponent() {
           {access_token && (
             <div className="relative flex gap-2">
               <motion.div
-                className="relative overflow-visible z-50  rounded-full flex cursor-auto border-2 border-[#212121] items-center pl-3.5 pr-4 py-2"
+                className="relative overflow-visible z-50  rounded-full flex cursor-pointer border-2 border-[#212121] items-center pl-3.5 pr-4 py-2"
                 onMouseEnter={() => setContributor(true)}
                 onMouseLeave={() => setContributor(false)}
                 ref={contributorRef}
+                onClick={() => handleLinkClick("/store")}
                 whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
@@ -288,6 +281,7 @@ function NavbarComponent() {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   ref={notificationRef}
+                  aria-label="Toggle notifications"
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                   onClick={() => setNotificationOpen(!notificationOpen)}
                   className={`flex cursor-pointer items-center rounded-full  px-4 py-2.5 ${
@@ -308,10 +302,12 @@ function NavbarComponent() {
                   )}
                 </motion.button>
                 {notificationOpen && (
-                  <Notifications
-                    totalNotifications={totalNotifications}
-                    setTotalNotifications={setTotalNotifications}
-                  />
+                  <div ref={notificationRef}>
+                    <Notifications
+                      totalNotifications={totalNotifications}
+                      setTotalNotifications={setTotalNotifications}
+                    />
+                  </div>
                 )}
               </div>
             </div>
@@ -319,13 +315,9 @@ function NavbarComponent() {
 
           <motion.button
             onClick={() => {
-              if (!access_token) {
-                setAuthOpen(true);
-              } else {
-                handleLinkClick("/create");
-              }
+              handleLinkClick("/create");
             }}
-            className="flex items-center justify-center px-6 py-2.5 bg-gradient-to-r from-purple-400 to-teal-400 text-white rounded-full"
+            className="create-btn relative flex min-w-[100px] min-h-[40px] items-center justify-center px-6 py-2.5 bg-gradient-to-r from-purple-400 to-teal-400 text-white rounded-full"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -338,12 +330,11 @@ function NavbarComponent() {
             >
               Create
             </motion.span>
-
             <Plus size={20} />
           </motion.button>
           {!access_token ? (
             <button
-              onClick={() => setAuthOpen(!authOpen)}
+              onClick={() => setAuthOpen(true)}
               className="bg-[#212121] px-4 py-2.5 font-bold rounded-full"
             >
               Sign In or Create Account
@@ -376,7 +367,7 @@ function NavbarComponent() {
                   {fullname.split(" ")[0]}
                 </div>
                 <img
-                  src={profile_img}
+                  src={profile_img || "/placeholder.svg"}
                   alt=""
                   className="object-cover ml-3 mr-0 rounded-full w-9 h-9"
                 />
@@ -471,7 +462,7 @@ function NavbarComponent() {
           style={{ background: "transparent" }}
           onClick={() => {
             setMobile(!mobile);
-            setIsMobileMenuOpen(!isMobileMenuOpen); // Update 3
+            setIsMobileMenuOpen(!isMobileMenuOpen);
           }}
         >
           {mobile ? <X /> : <Menu />}
@@ -488,15 +479,15 @@ function NavbarComponent() {
           open: { opacity: 1, x: 0 },
           closed: { opacity: 0, x: "100%" },
         }}
-        className={`fixed inset-0 z-[45] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMjEyMTIxIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMzMTMxMzEiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=')] opacity-20 transform transition-transform duration-300 ease-in-out',
+        className={`fixed inset-0 z-40 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMjEyMTIxIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMzMTMxMzEiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=')] opacity-20 transform transition-transform duration-300 ease-in-out',
           ${mobile ? "translate-x-0" : "translate-x-full"} 
         `}
       >
         <div
-          className={`fixed inset-0 top-[60px] w-full h-[calc(100vh-64px)] overflow-y-auto z-40`}
+          className={`fixed inset-0 top-[60px] w-screen h-[calc(100vh-64px)] overflow-y-auto z-40 ${
+            isActive("/feature") ? " bg-gray-900 bg-opacity-50 " : ""
+          }`}
         >
-          {" "}
-          {/* Update 4 */}
           <div className="min-h-full p-4">
             <div className="px-2 pt-2 pb-3 space-y-1 font-semibold">
               <button
@@ -511,16 +502,10 @@ function NavbarComponent() {
               {categoryShow && (
                 <AnimationWrapper transition={0.5}>
                   <div className="py-4 pt-2 pl-6 text-gray-300">
-                    {categories.map(({ name, icon }, index) => (
+                    {categories.map(({ name, icon, post }, index) => (
                       <Link
                         key={index}
-                        to={`/${
-                          name === "All"
-                            ? "elements"
-                            : name === "Favourites"
-                            ? "my favourites"
-                            : name.toLowerCase()
-                        }`}
+                        to={`/${name === "browse all" ? "elements" : name}`}
                         className={`text-gray-400 flex items-center py-2 px-3 rounded-lg capitalize ${
                           isActive(`/${name}`) ? "bg-[#212121]" : ""
                         }`}
@@ -540,18 +525,16 @@ function NavbarComponent() {
                 Challenges
               </Link>
               <Link
-                className={`text-gray-400 flex items-center py-2 px-3 rounded-lg ${
-                  isActive("/feature") ? "bg-[#212121]" : ""
+                className={`text-gray-100 flex items-center py-2 px-3 rounded-lg ${
+                  isActive("/feature") ? "bg-gray-800 bg-opacity-50" : ""
                 }`}
                 onClick={() => handleLinkClick("/feature")}
               >
                 Feature
               </Link>
               <Link
-                className={`text-gray-400 flex items-center py-2 px-3 rounded-lg ${
-                  isActive("/blog") ? "bg-[#212121]" : ""
-                }`}
-                onClick={() => handleLinkClick("/blog")}
+                className="text-gray-400 flex items-center py-2 px-3 rounded-lg"
+                onClick={() => handleLinkClick("/blogs")}
               >
                 Blog
               </Link>
@@ -562,7 +545,7 @@ function NavbarComponent() {
                   <div className="flex-shrink-0">
                     <img
                       className="object-cover rounded-md w-[46px] h-[46px]"
-                      src={profile_img}
+                      src={profile_img || "/placeholder.svg"}
                       alt=""
                     />
                   </div>
@@ -631,7 +614,7 @@ function NavbarComponent() {
                 <button
                   className="px-4 py-2.5 font-sans flex items-center gap-2 w-full border-none rounded-lg text-base font-semibold transition-colors duration-200 bg-[#212121] hover:bg-[#2e2e2e] text-offwhite cursor-pointer h-[42px]"
                   data-discover="true"
-                  onClick={() => setAuthOpen(!authOpen)}
+                  onClick={() => setAuthOpen(true)}
                 >
                   Sign in or Create Account
                 </button>
@@ -641,8 +624,13 @@ function NavbarComponent() {
         </div>
       </motion.div>
 
-      {isCreate && access_token && <ElementSelection />}
       {authOpen && <UserAuthentication handleCloseBtn={handleCloseBtn} />}
+      {isCreate &&
+        (access_token ? (
+          <ElementSelection />
+        ) : (
+          <UserAuthentication handleCloseBtn={handleCloseBtn} />
+        ))}
       <Outlet />
     </>
   );

@@ -25,10 +25,10 @@ import axios from "axios";
 import PostCard from "../components/post-card";
 import Sidebar from "../components/sidebar";
 import AnimationWrapper from "../../common/page-animation";
-import LoadingBar from "react-top-loading-bar";
 import toast from "react-hot-toast";
 import Footer from "../components/footer";
 import { UserContext } from "../../App";
+import Loader from "../../ui/loader";
 
 export default function Elements(props) {
   const [posts, setPosts] = useState([]);
@@ -37,6 +37,7 @@ export default function Elements(props) {
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const [sort, setSort] = useState("randomized");
   const [theme, setTheme] = useState("any");
+  const [style, setStyle] = useState("all");
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
   const sortButtonRef = useRef(null);
@@ -87,19 +88,22 @@ export default function Elements(props) {
 
   if (category == "elements") {
     category = "";
-  } 
+  }
 
   const fetchPosts = () => {
+    const payload = {
+      ...(category && { category }),
+      ...(searchQuery && { query: searchQuery.toString() }),
+      ...(style !== "all" && { tailwindCSS: style === "tailwind" }),
+      ...(sort && { sort }),
+      ...(theme && { theme }),
+      ...(limit && { limit }),
+      page: page || 1,
+    };
+
     props.setProgress(70);
     axios
-      .post(process.env.REACT_APP_SERVER_DOMAIN + "/explore-post", {
-        category,
-        query: searchQuery.toString(),
-        page,
-        sort,
-        theme,
-        limit,
-      })
+      .post(process.env.REACT_APP_SERVER_DOMAIN + "/explore-post", payload)
       .then(({ data }) => {
         props.setProgress(100);
         setPosts(data.posts);
@@ -152,7 +156,7 @@ export default function Elements(props) {
       fetchPosts();
     }
     fetchPostCount();
-  }, [category, location.search, searchQuery, sort, limit, page, theme]);
+  }, [category, location.search, searchQuery, sort, limit, page, theme, style]);
 
   const handleClickOutside = (event) => {
     if (
@@ -208,6 +212,55 @@ export default function Elements(props) {
                 </h1>
 
                 <div className="flex justify-end items-center flex-wrap gap-1 gap-y-2 ">
+                  <div className="h-6 w-px bg-zinc-800 hidden sm:block" />
+
+                  {/* Style */}
+
+                  <motion.div
+                    className="max-w-2xl mx-auto relative flex gap-1"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                  >
+                    <button
+                      className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium  hover:bg-[#212121] hover:text-white duration-300 ${
+                        style === "all"
+                          ? "bg-[#212121] text-white "
+                          : "text-zinc-400"
+                      }`}
+                      onClick={() => {
+                        setStyle("all");
+                      }}
+                    >
+                      All
+                    </button>
+                    <button
+                      className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium  hover:bg-[#212121] hover:text-white duration-300 ${
+                        style === "tailwind"
+                          ? "bg-[#212121] text-white "
+                          : "text-zinc-400"
+                      }`}
+                      onClick={() => {
+                        setStyle("tailwind");
+                      }}
+                    >
+                      <img src="/tailwind-logo.svg" alt="" width={20} />
+                      Tailwind
+                    </button>
+                    <button
+                      className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium  hover:bg-[#212121] hover:text-white duration-300 ${
+                        style === "css"
+                          ? "bg-[#212121] text-white "
+                          : "text-zinc-400"
+                      }`}
+                      onClick={() => {
+                        setStyle("css");
+                      }}
+                    >
+                      <img src="/css-logo.svg" alt="" width={20} />
+                      CSS
+                    </button>
+                  </motion.div>
                   <div className="h-6 w-px bg-zinc-800 hidden sm:block" />
 
                   {/* Sort */}
@@ -373,6 +426,7 @@ export default function Elements(props) {
               </div>
             </div>
           </div>
+          {!posts.length && <div className="mt-20"><Loader size={100} /></div>}
 
           <section className="grid gap-y-5 gap-x-3.5 content-stretch items-stretch w-full mb-24 max-xs:grid-cols-1 max-xs:gap-2.5 grid-cols-elements">
             {posts.map((item, index) => (

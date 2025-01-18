@@ -5,7 +5,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 import PostCard from "../components/post-card";
 import { Link } from "react-router-dom";
 
-const Feature = () => {
+const Feature = (props) => {
   const [posts, setPosts] = useState([]);
   const [users, setUsers] = useState([]);
 
@@ -64,11 +64,11 @@ const Feature = () => {
             <h2 className="text-4xl font-semibold mb-8 flex items-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
               <Trophy className="mr-2 text-blue-400 glow" /> Weekly Top Posts
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {posts.length === 0 ? (
                 <ClipLoader />
               ) : (
-                posts.map((post, index) => <PostCard post={post} user={post.user} key={index}/>)
+                posts.map((post, index) => <PostCard post={post} user={post.user} setProgress={props.setProgress} key={index}/>)
               )}
             </div>
           </section>

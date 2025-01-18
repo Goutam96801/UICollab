@@ -19,7 +19,12 @@ export default function Sidebar({ isOpen }) {
       const { data } = await axios.post(
         process.env.REACT_APP_SERVER_DOMAIN + "/get-categories"
       );
-      setCategories(data.category); // Save the categories in state
+
+      const updatedCategories = [
+        { name: "All", icon: "List", post: [] },
+        ...data.category,
+      ];
+      setCategories(updatedCategories);
     } catch (err) {
       console.error("Error fetching categories:", err);
     }
@@ -39,7 +44,7 @@ export default function Sidebar({ isOpen }) {
         {categories.map(({ name, icon }, index) => (
           <NavLink
             key={index}
-            to={name === "all" ? "/elements" : `/${name.toLowerCase()}`}
+            to={name === "All" ? "/elements" : `/${name.toLowerCase()}`}
             className={`mb-1 flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-normal tracking-wide transition-colors hover:bg-[rgb(33,33,33)] text-white"
                   `}
           >

@@ -10,11 +10,7 @@ import * as LucidIcons from "lucide-react";
 function CategoryDropdown() {
   const [categories, setCategories] = useState([]);
 
-  const getIconComponent = (name) => {
-    // Dynamically find the component from imported icons
-    const IconComponent = LucidIcons[name];
-    return IconComponent ? <IconComponent size={20} /> : null;
-  };
+  
 
   const fetchCategories = async () => {
     try {
@@ -25,7 +21,7 @@ function CategoryDropdown() {
       const updatedCategories = [
         { name: "All", icon: "List", post: [] },
         ...data.category,
-        { name: "My Favourites", icon: "Star", post: [] },
+        { name: "My Favourites", icon: "BookMarked", post: [] },
       ];
       setCategories(updatedCategories);
       // setCategories(data.category); // Save the categories in state
@@ -36,6 +32,11 @@ function CategoryDropdown() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  const getIconComponent = (name) => {
+    const IconComponent = LucidIcons[name];
+    return <IconComponent size={20} /> ;
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -73,15 +74,16 @@ function CategoryDropdown() {
                 to={name === "All" ? "/elements" : `/${name.toLowerCase()}`}
                 className="w-56 rounded-md flex flex-row justify-between gap-2 items-center cursor-pointer transition-all duration-300 bg-[#212121] hover:border-gray-200 border-[#a5a5a511] p-2"
               >
-                <div className="flex gap-2">
-                  <input type="radio" name="category" className="hidden" />
+                <div className="flex gap-2 text-[#a0a0a0]">
                   {getIconComponent(icon)}
-                  <span className="capitalize flex items-center text-center text-[#a0a0a0] font-semibold">
+                  <span className="capitalize flex items-center text-center  font-semibold">
                     {name}
                   </span>
                 </div>
                 <span className="text-sm text-white/50 text-center flex justify-center items-center">
-                  {post?.length ?? <ClipLoader color="#983fa5" size={15} />}
+                  {post?.length === 0
+                    ? ""
+                    : post?.length ?? <ClipLoader color="#983fa5" size={15} />}
                 </span>
               </Link>
             </motion.div>
