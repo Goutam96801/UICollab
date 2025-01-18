@@ -4,9 +4,7 @@ import {
   ChevronDown,
   UserRound,
   BookMarked,
-  MessageCircle,
   LogOut,
-  Bolt,
   X,
   Menu,
   User,
@@ -38,7 +36,6 @@ const itemVariants = {
 };
 
 function NavbarComponent() {
-  const [isHover, setIsHover] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
@@ -68,7 +65,6 @@ function NavbarComponent() {
   } = useContext(UserContext);
   const navigate = useNavigate();
   const location = useLocation();
-
 
   const fetchCategories = async () => {
     try {
@@ -252,7 +248,7 @@ function NavbarComponent() {
               onClick={() => handleLinkClick("/blog")}
             >
               Blog
-            </motion.button> 
+            </motion.button>
           </div>
         </motion.div>
         <motion.div
@@ -315,7 +311,11 @@ function NavbarComponent() {
 
           <motion.button
             onClick={() => {
-              handleLinkClick("/create");
+              access_token ? handleLinkClick("/create") : setProgress(70);
+              setTimeout(() => {
+                setProgress(100);
+                setAuthOpen(true);
+              }, 500);
             }}
             className="create-btn relative flex min-w-[100px] min-h-[40px] items-center justify-center px-6 py-2.5 bg-gradient-to-r from-purple-400 to-teal-400 text-white rounded-full"
             whileHover={{ scale: 1.1 }}
