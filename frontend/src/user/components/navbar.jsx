@@ -252,7 +252,7 @@ function NavbarComponent() {
               onClick={() => handleLinkClick("/blog")}
             >
               Blog
-            </motion.button>
+            </motion.button> 
           </div>
         </motion.div>
         <motion.div
