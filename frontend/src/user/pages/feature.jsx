@@ -4,6 +4,7 @@ import axios from "axios";
 import ClipLoader from "react-spinners/ClipLoader";
 import PostCard from "../components/post-card";
 import { Link } from "react-router-dom";
+import Footer from "../components/footer";
 
 const Feature = (props) => {
   const [posts, setPosts] = useState([]);
@@ -43,6 +44,7 @@ const Feature = (props) => {
   ];
 
   return (
+    <>
     <div className="min-h-screen bg-gray-900 text-white p-8 relative overflow-hidden">
       {/* <div className="fixed inset-0 overflow-hidden -z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-teal-500/10" />
@@ -116,10 +118,15 @@ const Feature = (props) => {
           </section>
         </div>
       </div>
+      
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMjEyMTIxIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMzMTMxMzEiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=')] opacity-20"></div>
       </div>
+
     </div>
+    
+    <Footer/>
+    </>
   );
 };
 

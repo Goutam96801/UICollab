@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2, Mail, Sparkles, Star } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
+import axios from 'axios';
 
 export default function BlogComingSoon() {
   const [email, setEmail] = useState("");
@@ -9,11 +11,25 @@ export default function BlogComingSoon() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsSubscribed(true);
-    setIsSubmitting(false);
+
+    setTimeout(async () => {
+      try {
+        const response = await axios.post(
+          process.env.REACT_APP_SERVER_DOMAIN + "/subscribe",
+          { email }
+        );
+
+        setIsSubmitting(false);
+        toast.success(response?.data?.message);
+        e.target.reset();
+      } catch (error) {
+        const errorMessage = error?.response?.data?.message;
+        setIsSubmitting(false);
+        toast.error(errorMessage || "something went wrong");
+      }
+    }, 1500);
   };
 
   return (
@@ -23,6 +39,7 @@ export default function BlogComingSoon() {
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-blue-500/10" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_500px_at_50%_200px,#3b0764,transparent)]" />
       </div> */}
+      <Toaster />
 
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="max-w-3xl mx-auto text-center space-y-8">

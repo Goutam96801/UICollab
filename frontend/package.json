@@ -26,6 +26,7 @@
     "monaco-tailwindcss": "^0.6.1",
     "monaco-vue": "^0.2.3",
     "motion": "^11.13.5",
+    "nodemailer": "^6.9.16",
     "openai": "^4.77.0",
     "popmotion": "11.0.3",
     "react": "^18.3.1",

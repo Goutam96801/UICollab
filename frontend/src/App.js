@@ -22,6 +22,7 @@ import AddCategory from './admin/components/add-category';
 import BlogComingSoon from './user/pages/blog-page';
 import Store from './user/pages/store';
 import MyFavourite from './user/pages/my-favourite';
+import NotFound from './user/pages/not-found';
 
 export const UserContext = createContext({});
 export const AdminContext = createContext({});
@@ -59,6 +60,7 @@ function App() {
             <Route path='/blog' element={<BlogComingSoon />} />
             <Route path='/my favourites' element={<MyFavourite setProgress={setProgress}/>}/>
             <Route path='/store' element={<Store setProgress={setProgress} />} />
+            <Route path='/not-found' element={<NotFound setProgress={setProgress} />} />
           </Route>
           <Route path='/admin-auth' element={<AdminHome setProgress={setProgress} />} />
           <Route path='/admin/' element={<AdminSidebar setProgress={setProgress} />}>

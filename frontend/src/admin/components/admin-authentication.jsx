@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import AstronautImage from "../../assets/astronaut.png";
+// import AstronautImage from "../../assets/astronaut.png";
 import GoogleIcon from '../../assets/icon-google.svg';
 import { X } from "lucide-react";
 import { authWithGoogle } from "../../common/firebase";
@@ -140,7 +140,7 @@ export default function AdminAuthentication({handleCloseBtn}) {
           </div>
         </div>
         <div className="hidden md:block image-container w-36 h-36 rotate-[25deg] absolute -top-4 -left-10 ease-in transition-all hover:rotate-[15deg] hover:translate-x-3 hover:scale-105">
-          <img className="absolute" src={AstronautImage} alt="" />
+          {/* <img className="absolute" src={AstronautImage} alt="" /> */}
         </div>
         <div className="max-w-[1600px] w-full z-50 rounded-full h-[366px] bg-gradient-to-b from-transparent from-0% via-90% to-100% via-indigo-700 to-transparent absolute bg-opacity-30 left-1/2 -translate-x-1/2 top-[-300px] blur-[100px]"></div>
       </div>

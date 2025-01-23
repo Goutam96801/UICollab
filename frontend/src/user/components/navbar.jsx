@@ -198,9 +198,9 @@ function NavbarComponent() {
           <Link
             to="/"
             onClick={() => handleLinkClick("/")}
-            className="flex items-center p-3 py-0 xl:pr-10 lg:pr-8  2xl:pr-22 pr-5 translate-y-[2px] logo-wrapper"
+            className="flex items-center translate-y-[2px] logo-wrapper"
           >
-            <img className="logo max-w-[85px]" src="/logo.svg" alt=""></img>
+            <img className="logo" src="/logo.png" alt="" width={150}></img>
           </Link>
           <div className="hidden md:flex space-x-2 font-semibold text-[16px] ">
             <motion.div
@@ -413,7 +413,7 @@ function NavbarComponent() {
                   <button
                     className="hover:text-gray-100 px-5 pl-3 py-2.5 flex items-center justify-start border-none cursor-pointer w-full text-center text-sm font-medium m-0 whitespace-nowrap rounded-[6px] text-gray-300"
                     onClick={() => {
-                      handleLinkClick("/favorites");
+                      handleLinkClick("/my favourites");
                       setIsMenuOpen(false);
                     }}
                   >

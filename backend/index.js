@@ -15,6 +15,8 @@ import Category from './model/category.js';
 import axios from "axios";
 import { Octokit } from "@octokit/rest";
 import category from './model/category.js';
+import NewsLetter from './model/NewsLetter.js';
+import nodemailer from 'nodemailer';
 
 
 const serviceAccountKey = {
@@ -169,6 +171,52 @@ app.post("/google-auth", async (req, res) => {
             return res.status(500).json({ error: "Failed to authenticate you with Google. Try with another account", err });
         });
 });
+
+
+app.post('/github-auth', async (req, res) => {
+    const { access_token } = req.body;
+
+    getAuth().verifyIdToken(access_token).then(async (decodedUser) => {
+        console.log(decodedUser)
+        let { email, name, picture } = decodedUser;
+        picture = picture.replace("s96-c", "s384-c");
+
+        let user = await User.findOne({ "personal_info.email": email })
+            .select("personal_info.fullname personal_info.username personal_info.profile_img account_info.contributor_points")
+            .then((u) => {
+                return u || null;
+            })
+            .catch(err => {
+                console.error(err);
+                return res.status(500).json({ error: err.message });
+            });
+
+        if (!user) {
+            let username = await generateUsername(name);
+            user = new User({
+                personal_info: { fullname: name, email, username, profile_img: picture }
+            });
+
+            await user.save()
+                .then((u) => {
+                    user = u;
+                })
+                .catch(err => {
+                    console.error(err);
+                    return res.status(500).json({ error: err.message });
+                });
+        }
+        return res.status(200).json(formatDatatoSend(user));
+    })
+        .catch((err) => {
+            console.error("GitHub Authentication Error: ", err);
+            return res.status(500).json({ error: "Failed to authenticate with GitHub. Try with another account", err });
+
+
+        })
+});
+
+
 
 
 // Get profile
@@ -506,7 +554,7 @@ app.post('/get-post', async (req, res) => {
 
 app.post('/favourite-post', verifyJWT, async (req, res) => {
     const userId = req.user;
-    
+
     Post.find({ user_saved: userId }).populate('author', 'personal_info.username personal_info.profile_img -_id')
         .select('postId title htmlCode cssCode category tailwindCSS backgroundColor tags activity.total_views activity.total_saves activity.total_comments theme createdAt _id')
         .then(posts => {
@@ -1174,6 +1222,56 @@ app.post("/get-all-user", verifyJWT, async (req, res) => {
         return res.status(401).json({ error: "Unauthorized" });
     })
 })
+
+async function sendConfirmationEmail(email) {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_ID,
+            pass: process.env.EMAIL_PASSWORD
+        }
+    });
+
+    const mailOptions = {
+        from: '"UICollab" <your-email@gmail.com>',
+        to: email,
+        subject: 'Thank you for subscribing!',
+        text: 'You have successfully subscribed to the UICollab newsletter.',
+        html: '<p>You have successfully subscribed to the <strong>UICollab</strong> newsletter.</p>'
+    };
+
+    await transporter.sendMail(mailOptions);
+}
+
+app.post('/subscribe', async (req, res) => {
+    const { email } = req.body;
+
+    console.log('Incoming email:', email);
+
+    if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+    }
+
+    try {
+        const existingSubscriber = await NewsLetter.findOne({ email });
+        console.log('Existing subscriber:', existingSubscriber);
+
+        if (existingSubscriber) {
+            return res.status(400).json({ message: 'You already subscribe to our newsletter.' });
+        }
+
+        const subscriber = new NewsLetter({ email });
+        await subscriber.save();
+        console.log('New subscriber saved:', subscriber);
+
+        // await sendConfirmationEmail(email);
+        res.status(201).json({ message: 'Thank you for subscribing to our newsletter.' });
+    } catch (error) {
+        console.error('Error occurred:', error); // Log the actual error
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
 
 app.listen(PORT, () => {
     console.log("Server is running at PORT: " + PORT);

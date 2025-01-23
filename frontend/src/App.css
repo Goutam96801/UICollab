@@ -61,7 +61,6 @@ body {
 }
 
 .authentication-fg {
-  background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.4);
 }
 
@@ -181,3 +180,48 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(294px, 1fr)) !important;
 }
 
+.animation-auth{
+  animation:  scale-up 3s ease-in-out alternate infinite;
+}
+
+.coin{
+  animation: scale-down 3s ease-in-out alternate infinite;
+}
+.spring{
+  animation: scale-up 3s ease-in-out alternate infinite;
+}
+.dots{
+  animation: scale-down 3s ease-in-out alternate infinite;
+}
+.rocket{
+  animation: scale-up 3s ease-in-out alternate infinite;
+}
+.cloud{
+  animation: left-right 3s ease-in-out alternate infinite;
+}
+.stars{
+  animation: scale-down 3s ease-in-out alternate infinite;
+}
+
+@keyframes left-right {
+  to{
+    transform: translateX(10px);
+  }
+}
+@keyframes up-down {
+  to{
+    transform: translateY(10px);
+  }
+}
+
+@keyframes scale-down {
+  to{
+    transform: scale(0.95);
+  }
+}
+
+@keyframes scale-up {
+  to{
+    transform: scale(1.05);
+  }
+}
