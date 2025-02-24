@@ -8,17 +8,17 @@ export default function ContributorPoint() {
         {/* Header */}
         <div className="flex items-center gap-2 w-full justify-center">
           <BadgeCent color="teal" />
-          <h2 className="text-lg font-semibold">CollabCoins</h2>
+          <h2 className="text-lg font-bold">CollabCoins</h2>
         </div>
 
         {/* Description */}
-        <p className="text-[#A1A1AA] text-sm text-center leading-relaxed">
+        <p className="text-[#A1A1AA] text-sm text-center leading-relaxed font-semibold">
           Redeem our products for free using CollabCoins.
         </p>
 
         {/* Points Section */}
         <div className="space-y-4">
-          <h3 className="text-sm font-medium">You'll get:</h3>
+          <h3 className="text-sm font-semibold">You'll get:</h3>
 
           <div className="space-y-3">
             <PointRow
@@ -45,11 +45,11 @@ export default function ContributorPoint() {
 function PointRow({ points, description }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="flex items-center gap-2 bg-black/20 px-4 py-2 rounded-xl min-w-[90px]">
-        <BadgeCent color="teal" />
+      <div className="flex items-center gap-1 bg-black/20 p-2 rounded-xl min-w-[80px]">
+        <BadgeCent color="teal" size={20}/>
         <span className="font-semibold">{points}</span>
       </div>
-      <span className="text-[#A1A1AA] text-[15px]">{description}</span>
+      <span className="text-[#A1A1AA] text-[15px] font-semibold">{description}</span>
     </div>
   );
 }

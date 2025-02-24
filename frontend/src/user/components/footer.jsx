@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import {
   Loader2,
-  Mail,
   Twitter,
   Facebook,
   Instagram,
@@ -11,6 +10,8 @@ import {
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import LoadingBar from "react-top-loading-bar";
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
@@ -20,6 +21,8 @@ const fadeIn = {
 export default function Footer() {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const [progress, setProgress] = useState(0)
 
   const handleSubscription = async (e) => {
     e.preventDefault();
@@ -43,8 +46,23 @@ export default function Footer() {
       }
     }, 1500);
   };
+
+  const handleLinkClick = (path) => {
+    setProgress(70);
+    setTimeout(() => {
+      setProgress(100);
+      navigate(path);
+    }, 500);
+  };
+
   return (
-    <footer className="bg-[#0D1117] text-white py-16">
+    <footer className="bg-[#111] text-white py-16">
+      <LoadingBar
+          color="#7781b7"
+          progress={progress}
+          onLoaderFinished={() => setProgress(0)}
+          className="z-50"
+        />
       <Toaster />
       <div className=" mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
@@ -61,37 +79,31 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-6">Quick Links</h3>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#"
+                <button 
+                  onClick={() => handleLinkClick('/elements')}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   UI Components
-                </a>
+                </button>
               </li>
               <li>
-                <a
-                  href="#"
+                <button
+                onClick={() => handleLinkClick('/blog')}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Blog
-                </a>
+                </button>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="https://github.com/uicollab/universe"
+                  target="_blank"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Community
-                </a>
+                </Link>
               </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Resources
-                </a>
-              </li>
+              
             </ul>
           </motion.div>
 
@@ -100,36 +112,28 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-6">Support</h3>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  FAQ
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Contact Us
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
+                <Link
+                 onClick={() => handleLinkClick("/terms")}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Terms of Service
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  onClick={() => handleLinkClick("/policy")}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Privacy Policy
-                </a>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  onClick={() => handleLinkClick("/cookies")}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  Cookies Policy
+                </Link>
               </li>
             </ul>
           </motion.div>

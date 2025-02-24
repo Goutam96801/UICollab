@@ -61,7 +61,7 @@ function ProfilePage(props) {
   };
 
   useEffect(() => {
-    resetState();
+    resetState(); 
     fetchUserProfile();
   }, [profileId, updateProfile]);
 

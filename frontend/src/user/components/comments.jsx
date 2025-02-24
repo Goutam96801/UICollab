@@ -175,7 +175,7 @@ const Comments = ({ post }) => {
               className={`relative z-30 px-8 py-3 h-12 font-sans  disabled:cursor-auto border-none cursor-pointer bg-gradient-to-br from-purple-400 to-teal-400 text-offwhite font-semibold rounded-full disabled:bg-[#5b5b5b] ${
                 newComment ? "" : "disabled"
               }`}
-              disabled={loading}
+              disabled={loading} 
             >
               {loading ? "Sending..." : "Send"}
             </motion.button>
@@ -336,7 +336,7 @@ const Comments = ({ post }) => {
                       />
                       <button
                         disabled=""
-                        className="disabled:bg-[#484848] px-8 py-3 font-sans  disabled:cursor-auto bg-purple-600 border-none cursor-pointer h-full  font-semibold rounded-lg transition"
+                        className={`relative z-30 px-8 py-3 h-12 font-sans  disabled:cursor-auto border-none cursor-pointer bg-gradient-to-br from-purple-400 to-teal-400 text-offwhite font-semibold rounded-full disabled:bg-[#5b5b5b]`}
                         onClick={() => addReply(comment._id)}
                       >
                         Send

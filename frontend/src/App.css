@@ -115,16 +115,15 @@ body {
     padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
   }
-}
+} 
 
 
 .scroll-container {
   display: flex;
-  width: max-content; /* Allows the container to stretch based on content */
-  animation: scroll-left 10s linear infinite; /* Scrolling animation */
+  width: max-content; 
+  animation: scroll-left 10s linear infinite; 
 }
 
-/* Stop animation on hover */
 .scroll-container:hover {
   animation-play-state: paused;
 }
@@ -134,7 +133,7 @@ body {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(calc(-100% + 100vw)); /* Scroll through all posts */
+    transform: translateX(calc(-100% + 100vw)); 
   }
 }
 
@@ -178,6 +177,10 @@ body {
 
 .grid-cols-elements {
   grid-template-columns: repeat(auto-fill, minmax(294px, 1fr)) !important;
+}
+
+.grid-cols-home{
+  grid-template-columns: repeat(auto-fill, minmax(244px, 1fr)) !important;
 }
 
 .animation-auth{
@@ -225,3 +228,4 @@ body {
     transform: scale(1.05);
   }
 }
+

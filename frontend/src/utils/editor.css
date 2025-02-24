@@ -1,0 +1,24 @@
+.tiptap {
+    :first-child {
+      margin-top: 0;
+    }
+
+    pre {
+      background-color: #000;
+      border-radius: 0.4rem;
+      font-size: 0.85rem;
+      padding: 8px;
+      margin: 8px 0;
+
+    }
+  
+    a {
+      color: purple;
+      cursor: pointer;
+      text-decoration: underline;
+  
+      &:hover {
+        color: rgb(116, 14, 116);
+      }
+    }
+  }

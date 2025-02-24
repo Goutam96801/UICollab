@@ -192,7 +192,7 @@ export default function CodeEditor({
             {showAIAssistant ? (
               <X className="w-6 h-6" />
             ) : (
-              <img src="/AI-Assistant.png" className="w-6 h-6" />
+              <img src="/AI-Assistant.png" alt="" className="w-6 h-6" />
             )}
           </motion.button>
         </div>

@@ -6,13 +6,14 @@ import { ClipLoader } from "react-spinners";
 import SocialCard from "./social_card";
 import axios from "axios";
 import * as LucidIcons from "lucide-react";
+import Loader from "../../ui/loader";
 
 function CategoryDropdown() {
   const [categories, setCategories] = useState([]);
-
-  
+  const [loading, setLoading] = useState(false);
 
   const fetchCategories = async () => {
+    setLoading(true);
     try {
       const { data } = await axios.post(
         process.env.REACT_APP_SERVER_DOMAIN + "/get-categories"
@@ -23,9 +24,10 @@ function CategoryDropdown() {
         ...data.category,
         { name: "My Favourites", icon: "BookMarked", post: [] },
       ];
+      setLoading(false);
       setCategories(updatedCategories);
-      // setCategories(data.category); // Save the categories in state
     } catch (err) {
+      setLoading(false);
       console.error("Error fetching categories:", err);
     }
   };
@@ -35,7 +37,7 @@ function CategoryDropdown() {
 
   const getIconComponent = (name) => {
     const IconComponent = LucidIcons[name];
-    return <IconComponent size={20} /> ;
+    return <IconComponent size={20} />;
   };
 
   const containerVariants = {
@@ -62,6 +64,11 @@ function CategoryDropdown() {
           initial="hidden"
           animate="visible"
         >
+          {loading && (
+            <div className="block mx-auto my-auto">
+              <Loader size={50} />
+            </div>
+          )}
           {categories.map(({ name, icon, post }, index) => (
             <motion.div
               key={index}

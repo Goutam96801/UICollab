@@ -15,8 +15,6 @@ import {
   Moon,
 } from "lucide-react";
 import {
-  Link,
-  Navigate,
   useLocation,
   useNavigate,
   useParams,
@@ -28,7 +26,6 @@ import AnimationWrapper from "../../common/page-animation";
 import toast from "react-hot-toast";
 import Footer from "../components/footer";
 import { UserContext } from "../../App";
-import Loader from "../../ui/loader";
 
 export default function Elements(props) {
   const [posts, setPosts] = useState([]);
@@ -426,10 +423,10 @@ export default function Elements(props) {
               </div>
             </div>
           </div>
-          {!posts.length && <div className="mt-20"><Loader size={100} /></div>}
 
           <section className="grid gap-y-5 gap-x-3.5 content-stretch items-stretch w-full mb-24 max-xs:grid-cols-1 max-xs:gap-2.5 grid-cols-elements">
-            {posts.map((item, index) => (
+            {posts.length === 0 ? <h1 className="text-center">No Post Found</h1>: 
+            posts.map((item, index) => (
               <PostCard
                 post={item}
                 user={user}

@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AdminContext } from "../../App";
 import axios from "axios";
-import { Link, Navigate } from "react-router-dom";
-import { CircleCheck, BookCheck, Ban } from "lucide-react";
+import { Navigate } from "react-router-dom";
+import { CircleCheck, BookCheck, Ban, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
-// Mock data based on the schema
+import { removeFromSession } from "../../common/session";
+
 const adminDataStructure = {
   personal_info: {
     username: "",
@@ -15,65 +16,55 @@ const adminDataStructure = {
   },
   account_info: {
     total_post_published: 0,
-    total_blog_published: 0,
+    total_blogs: 0,
     total_post_rejected: 0,
-    total_blog_rejected: 0,
   },
   post_published: [],
-  blog_published: [],
+  blogs: [],
   post_rejected: [],
-  blog_rejected: [],
   joinedAt: "",
 };
 
-export default function AdminDashboard() {
+export default function AdminDashboard(props) {
   const [activeTab, setActiveTab] = useState("published");
   const [adminData, setAdminData] = useState(adminDataStructure);
   const [showAllPosts, setShowAllPosts] = useState(false);
   const [showAllBlogs, setShowAllBlogs] = useState(false);
-  const [showAllRejectedPosts, setShowAllRejectedPosts] = useState(false); 
+  const [showAllRejectedPosts, setShowAllRejectedPosts] = useState(false);
   const [showAllRejectedBlogs, setShowAllRejectedBlogs] = useState(false);
 
   let {
     adminAuth: { access_token },
     setAdminAuth,
   } = useContext(AdminContext);
-  
+
   let {
     personal_info: { username, email, fullname, profile_img, isVerified },
-    account_info: {
-      total_post_published,
-      total_blog_published,
-      total_post_rejected,
-      total_blog_rejected,
-    },
+    account_info: { total_post_published, total_blogs, total_post_rejected },
     post_published,
-    blog_published,
+    blogs,
     post_rejected,
-    blog_rejected,
     joinedAt,
-  } = adminData ;
-
-  
+  } = adminData;
 
   const fetchAdminProfile = async () => {
     access_token &&
-    await axios
-      .post(
-        process.env.REACT_APP_SERVER_DOMAIN + "/admin/get-profile",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        }
-      )
-      .then(({ data }) => {
-        setAdminData(data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      (await axios
+        .post(
+          process.env.REACT_APP_SERVER_DOMAIN + "/admin/get-profile",
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+            },
+          }
+        )
+        .then(({ data }) => {
+          setAdminData(data);
+        })
+        .catch((err) => {
+          console.log(err);
+        }));
   };
 
   useEffect(() => {
@@ -95,20 +86,37 @@ export default function AdminDashboard() {
     visible: { opacity: 1, y: 0 },
   };
 
-  return (
-    access_token ? 
+  const handleLogout = () => {
+    props.setProgress(70);
+    setTimeout(() => {
+      props.setProgress(100);
+      removeFromSession("admin");
+      setAdminAuth({ access_token: null });
+    }, 1000);
+  };
+
+  return access_token ? (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-dark-700 mx-auto p-6 h-[100vh] w-[calc(100vw-250px)] overflow-y-auto"
+      className="bg-gradient-to-br from-gray-900 to-gray-800 mx-auto p-6 h-[100vh] w-[calc(100vw-250px)] overflow-y-auto"
     >
-      <h1 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-teal-400">
-        Dashboard
-      </h1>
+      <div className="flex justify-between mb-4">
+        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-teal-400">
+          Dashboard
+        </h1>
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 text-lg font-bold flex items-center gap-1 border border-[#212121] rounded-lg hover:bg-[#212121] duration-300"
+        >
+          <LogOut size={20} />
+          Logout
+        </button>
+      </div>
       <div className="grid gap-6 md:grid-cols-2">
         {/* Personal Information Card */}
-        <div className=" rounded-lg shadow-xl bg-[#212121] p-6">
+        <div className=" rounded-lg shadow-xl bg- p-6 bg-gray-900">
           <h2 className="text-xl font-semibold mb-4">Personal Information</h2>
           <div className="flex items-center space-x-4">
             <img
@@ -144,7 +152,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Account Statistics Card */}
-        <div className=" rounded-lg shadow-xl bg-[#212121] p-6">
+        <div className=" rounded-lg shadow-xl bg-gray-900 p-6">
           <h2 className="text-xl font-semibold mb-4">Account Statistics</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -155,20 +163,12 @@ export default function AdminDashboard() {
             </div>
             <div>
               <p className="text-sm font-medium">Blogs Published</p>
-              <p className="text-2xl font-bold text-green-500">
-                {total_blog_published}
-              </p>
+              <p className="text-2xl font-bold text-green-500">{total_blogs}</p>
             </div>
             <div>
               <p className="text-sm font-medium">Posts Rejected</p>
               <p className="text-2xl font-bold text-red-500">
                 {total_post_rejected}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm font-medium">Blogs Rejected</p>
-              <p className="text-2xl font-bold text-red-500">
-                {total_blog_rejected}
               </p>
             </div>
           </div>
@@ -181,8 +181,8 @@ export default function AdminDashboard() {
             <button
               className={`py-2 px-4 text-center text-green-500 font-medium text-base flex gap-2 duration-300 rounded ${
                 activeTab === "published"
-                  ? "bg-[#212121]"
-                  : "  hover:bg-[#212121]"
+                  ? "bg-gray-800"
+                  : "  hover:bg-gray-900"
               }`}
               onClick={() => setActiveTab("published")}
             >
@@ -192,8 +192,8 @@ export default function AdminDashboard() {
             <button
               className={` py-2 px-4 text-center text-red-500 font-medium text-base rounded flex gap-2 duration-300 ${
                 activeTab === "rejected"
-                  ? "bg-[#212121]"
-                  : "  hover:bg-[#212121]"
+                  ? "bg-gray-800"
+                  : "  hover:bg-gray-900"
               }`}
               onClick={() => setActiveTab("rejected")}
             >
@@ -208,7 +208,7 @@ export default function AdminDashboard() {
           {activeTab === "published" && (
             <div className="grid gap-6 md:grid-cols-2">
               {/* Published Posts */}
-              <div className=" rounded-lg shadow-xl bg-[#a5a5a511] p-6">
+              <div className=" rounded-lg shadow-xl bg-gray-800 p-6">
                 <h3 className="text-lg font-semibold mb-2">Published Posts</h3>
                 <p className="text-sm text-gray-600 mb-4">
                   Recently published posts
@@ -219,7 +219,7 @@ export default function AdminDashboard() {
                   animate="visible"
                   className="space-y-2"
                 >
-                   {post_published.length === 0 && (
+                  {post_published.length === 0 && (
                     <p>You have not published any post.</p>
                   )}
                   {(showAllPosts
@@ -273,7 +273,7 @@ export default function AdminDashboard() {
               </div>
 
               {/* Published Blogs */}
-              <div className=" rounded-lg shadow-xl bg-[#a5a5a511] p-6 ">
+              <div className=" rounded-lg shadow-xl bg-gray-800 p-6 ">
                 <h3 className="text-lg font-semibold mb-2">Published Blogs</h3>
                 <p className="text-sm text-gray-600 mb-4">
                   Recently published blogs
@@ -284,51 +284,48 @@ export default function AdminDashboard() {
                   animate="visible"
                   className="space-y-2"
                 >
-                  {blog_published.length === 0 && (
+                  {blogs.length === 0 && (
                     <p>You have not published any blog.</p>
                   )}
-                  {(showAllBlogs
-                    ? blog_published
-                    : blog_published.slice(0, 5)
-                  ).map((blog, index) => (
-                    <motion.a
-                      variants={itemVariants}
-                      whileHover={{ scale: 1.05 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 400,
-                        damping: 10,
-                      }}
-                      href={`/admin/posts/${username}/${blog}`}
-                      key={index}
-                      className="flex items-center space-x-2 bg-[#1c1c1c] py-2 px-2 rounded-full"
-                    >
-                      <svg
-                        className="w-4 h-4 text-green-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
+                  {(showAllBlogs ? blogs : blogs.slice(0, 5)).map(
+                    (blog, index) => (
+                      <motion.a
+                        variants={itemVariants}
+                        whileHover={{ scale: 1.05 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 10,
+                        }}
+                        href={`/admin/posts/${username}/${blog}`}
+                        key={index}
+                        className="flex items-center space-x-2 bg-[#1c1c1c] py-2 px-2 rounded-full"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <span>{blog}</span>
-                    </motion.a>
-                  ))}
+                        <svg
+                          className="w-4 h-4 text-green-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <span>{blog}</span>
+                      </motion.a>
+                    )
+                  )}
                 </motion.ul>
                 <button
                   className={`mt-4 w-auto py-2.5 px-4 rounded-full bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-teal-400 border-[#2a2a2a] border-2 ${
-                    blog_published.length <= 5
-                      ? "opacity-20 cursor-not-allowed"
-                      : ""
+                    blogs.length <= 5 ? "opacity-20 cursor-not-allowed" : ""
                   }`}
                   onClick={() => setShowAllBlogs(!showAllBlogs)}
-                  disabled={blog_published.length <= 5}
+                  disabled={blogs.length <= 5}
                 >
                   {showAllBlogs ? "Show Less" : "View All Published Posts"}
                 </button>
@@ -350,7 +347,7 @@ export default function AdminDashboard() {
                   animate="visible"
                   className="space-y-2"
                 >
-                {post_rejected.length === 0 && (
+                  {post_rejected.length === 0 && (
                     <p>You have not rejected any post.</p>
                   )}
                   {(showAllRejectedPosts
@@ -358,17 +355,17 @@ export default function AdminDashboard() {
                     : post_rejected.slice(0, 5)
                   ).map((post, index) => (
                     <motion.a
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.05 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 400,
-                      damping: 10,
-                    }}
-                    href={`/admin/posts/${username}/${post.postId}`}
-                    key={index}
-                    className="flex items-center space-x-2 bg-[#1c1c1c] py-2 px-2 rounded-full"
-                  >
+                      variants={itemVariants}
+                      whileHover={{ scale: 1.05 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 10,
+                      }}
+                      href={`/admin/posts/${username}/${post.postId}`}
+                      key={index}
+                      className="flex items-center space-x-2 bg-[#1c1c1c] py-2 px-2 rounded-full"
+                    >
                       <svg
                         className="w-4 h-4 text-red-500"
                         fill="none"
@@ -399,7 +396,9 @@ export default function AdminDashboard() {
                   }`}
                   disabled={post_rejected.length <= 5}
                 >
-                  {showAllRejectedPosts ? "Show Less" : "View All Rejected Posts"}
+                  {showAllRejectedPosts
+                    ? "Show Less"
+                    : "View All Rejected Posts"}
                 </motion.button>
               </div>
 
@@ -414,64 +413,14 @@ export default function AdminDashboard() {
                   initial="hidden"
                   animate="visible"
                   className="space-y-2"
-                >
-                {blog_rejected.length === 0 && (
-                    <p>You have not rejected any blog.</p>
-                  )}
-                  {( showAllRejectedBlogs
-                    ? blog_rejected
-                    : blog_rejected.slice(0, 5)
-                  ).map((blog, index) => (
-                    <motion.a
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.05 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 400,
-                      damping: 10,
-                    }}
-                    href={`/admin/blogs/${username}/${blog.blogId}`}
-                    key={index}
-                    className="flex items-center space-x-2 bg-[#1c1c1c] py-2 px-2 rounded-full"
-                  >
-                      <svg
-                        className="w-4 h-4 text-red-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <span>{blog.blogId}</span>
-                    </motion.a>
-                  ))}
-                </motion.ul>
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                  onClick={() => setShowAllRejectedBlogs(!showAllRejectedBlogs)}
-                  className={`mt-4 w-auto py-2.5 px-4 rounded-full bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-teal-400 border-[#2a2a2a] border-2 ${
-                    blog_rejected.length <= 5
-                      ? "opacity-20 cursor-not-allowed"
-                      : ""
-                  }`}
-                  disabled={blog_rejected.length <= 5}
-                >
-                  {showAllRejectedBlogs ? "Show Less" : "View All Rejected Blogs"}
-                </motion.button>
+                ></motion.ul>
               </div>
             </div>
           )}
         </div>
       </div>
     </motion.div>
-    : <Navigate to="/admin-auth"/>
+  ) : (
+    <Navigate to="/admin-auth" />
   );
 }

@@ -17,6 +17,7 @@ import { Octokit } from "@octokit/rest";
 import category from './model/category.js';
 import NewsLetter from './model/NewsLetter.js';
 import nodemailer from 'nodemailer';
+import Blog from './model/Blog.js';
 
 
 const serviceAccountKey = {
@@ -51,7 +52,8 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccountKey)
 })
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 
 
@@ -70,7 +72,7 @@ const generateUsername = async (fullname) => {
 }
 
 const formatDatatoSend = (user) => {
-    const access_token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
+    const access_token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '10d' })
     return {
         access_token,
         fullname: user.personal_info.fullname,
@@ -232,6 +234,19 @@ app.post("/get-profile", async (req, res) => {
         })
 })
 
+app.post("/get-logged-user", verifyJWT, async (req, res) => {
+    let userId = req.user;
+
+    await User.findById(userId)
+        .select("")
+        .then(user => {
+            return res.status(200).json(user);
+        })
+        .catch(err => {
+            return res.status(500).json({ error: err.message })
+        })
+})
+
 app.get("/logged-user", verifyJWT, async (req, res) => {
     let userId = req.user;
 
@@ -346,7 +361,7 @@ app.post("/create-post", verifyJWT, async (req, res) => {
 })
 
 app.post("/trending-post", async (req, res) => {
-    Post.find({ status: 'published' }).populate("author", "personal_info.username personal_info.profile_img -_id")
+    Post.find({ status: 'published', theme: 'dark' }).populate("author", "personal_info.username personal_info.profile_img -_id")
         .sort({
             "activity.total_saves": -1,
             "activity.total_views": -1,
@@ -1002,13 +1017,110 @@ app.post("/admin/google-auth", async (req, res) => {
 
 // Admin Profile route
 
+app.post("/create-blog", verifyJWT, (req, res) => {
+    let authorId = req.user;
+
+    let { title, label, content, banner, status, isOriginal, sourceLink, sourceCreator, id } = req.body;
+
+    if (!title || !banner || !label || isOriginal === undefined) {
+        return res.status(400).json({ message: "Missing required fields" })
+    }
+
+
+    let blog_id = id || title
+        .replace(/[^a-zA-Z0-9]/g, " ")
+        .replace(/\s+/g, "-")
+        .trim()
+        .toLowerCase();
+
+    if (id) {
+        Blog.findOneAndUpdate({ blog_id }, { title, label, content, status, isOriginal, sourceLink, sourceCreator })
+            .then(() => {
+                return res.status(200).json({ id: blog_id });
+            })
+            .catch((err) => {
+                return res.status(500).json({ error: err.message });
+            });
+    } else {
+        let blog = new Blog({
+            title,
+            label,
+            content,
+            banner,
+            status: status || 'draft',
+            isOriginal,
+            sourceLink,
+            sourceCreator,
+            blog_id,
+            author: authorId,
+        });
+        blog.save().then((blog) => {
+            let incrementVal = status === 'draft' ? 0 : 1;
+
+            Admin.findOneAndUpdate({ _id: authorId }, {
+                $inc: { "account_info.total_blogs": incrementVal },
+                $push: { blogs: blog._id },
+            }).then((user) => {
+                return res.status(200).json({ id: blog.blog_id });
+            })
+                .catch((err) => {
+                    return res
+                        .status(500)
+                        .json({ error: "Failed to update total blog number" });
+                });
+        })
+            .catch((err) => {
+                return res.status(500).json({ error: err.message });
+            });
+    }
+
+})
+
+app.post("/admin-blogs", verifyJWT, (req, res) => {
+    let adminId = req.user;
+    let { status } = req.body;
+
+    let findQuery = { status: status, author: adminId };
+
+    Blog.find(findQuery)
+        .populate('author', 'personal_info.username personal_info.profile_img -_id')
+        .select('blog_id title banner content status label activity isOriginal sourceCreator sourceLink publishedAt _id')
+        .then(blogs => {
+            return res.status(200).json(blogs);
+        })
+        .catch(err => {
+            return res.status(500).json({ error: err.message });
+        });
+
+
+})
+
+app.post("/admin-get-blog", verifyJWT, (req, res) => {
+    let adminId = req.user;
+    let { blogId } = req.body;
+
+    let findQuery = { blog_id: blogId, author: adminId };
+
+    Blog.findOne(findQuery)
+        .populate('author', 'personal_info.username personal_info.profile_img -_id')
+        .select('blog_id title banner content status label activity isOriginal sourceCreator sourceLink publishedAt _id')
+        .then(blog => {
+            return res.status(200).json(blog);
+        })
+        .catch(err => {
+            return res.status(500).json({ error: err.message });
+        });
+
+
+})
+
 app.post("/admin/get-profile", verifyJWT, async (req, res) => {
     let { adminId } = req.user;
     const { skip = 0, limit = 5 } = req.body;
     await Admin.findOne({ adminId })
         .select(" -updatedAt")
         .populate("post_published", "postId -_id")
-        // .populate("blog_published", "blogId -_id")
+        .populate("blogs", "blogId -_id")
         .populate("post_rejected", "postId -_id")
         // .populate("blog_rejected", "blogId -_id")
         .skip(skip)
@@ -1221,6 +1333,16 @@ app.post("/get-all-user", verifyJWT, async (req, res) => {
     }).catch(err => {
         return res.status(401).json({ error: "Unauthorized" });
     })
+})
+
+app.post('/user-count', async (req, res) => {
+
+    User.countDocuments()
+        .then(count => {
+            return res.status(200).json({ totalDocs: count })
+        }).catch(err => {
+            return res.status(500).json({ error: err.message })
+        })
 })
 
 async function sendConfirmationEmail(email) {

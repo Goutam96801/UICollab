@@ -31,7 +31,7 @@ const AdminSchema = mongoose.Schema({
             type: Number,
             default: 0
         },
-        total_blog_published: {
+        total_blogs: {
             type: Number,
             default: 0
         },
@@ -39,10 +39,10 @@ const AdminSchema = mongoose.Schema({
             type: Number,
             default: 0
         },
-        total_blog_rejected: {
+        total_reads:{
             type: Number,
             default: 0
-        },
+        }
 
     },
 
@@ -57,7 +57,7 @@ const AdminSchema = mongoose.Schema({
         ref: "posts",
         default: [],
     },
-    blog_published: {
+    blogs: {
         type: [Schema.Types.ObjectId],
         ref: "blogs",
         default: [],
@@ -68,11 +68,7 @@ const AdminSchema = mongoose.Schema({
         ref: "posts",
         default: [],
     },
-    blog_rejected: {
-        type: [Schema.Types.ObjectId],
-        ref: "blogs",
-        default: [],
-    },
+    
 },
     {
         timestamps: {

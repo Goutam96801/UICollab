@@ -61,7 +61,7 @@ function PostCategory({ onContinue }) {
         </div>
         {
           categories.length === 0
-          && <Loader size={16}/>
+          && <Loader size={50}/>
         }
         <div className="grid grid-cols-3 gap-4 mb-6">
           {categories.map(({ name, icon }, index) => (

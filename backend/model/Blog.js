@@ -1,59 +1,67 @@
-import mongoose, {Schema} from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 const blogSchema = mongoose.Schema({
-    BlogId:{
-        type:String,
-        required:true,
-        unique:true
+
+    blog_id: {
+        type: String,
+        required: true,
+        unique: true
     },
-    user: {
+    title: {
+        type: String,
+        required: true,
+        unique: [true, "Title of your blog should be unique"],
+    },
+    banner:{
+        type: String,
+        required: true
+    },
+    content: {
+        type: []
+    },
+    label: {
+        type: String,
+        required: true,
+    },
+    isOriginal: {
+        type: Boolean,
+        required: true,
+    },
+    sourceLink: {
+        type: String,
+        default: '',
+    },
+    sourceCreator: {
+        type: String,
+        default: '',
+    },
+    author: {
         type: Schema.Types.ObjectId,
-        ref: 'users',
-        required: true 
+        required: true,
+        ref: 'admin'
     },
-    htmlCode: {
-        type: String,
-        required: true
-    },
-    cssCode: {
-        type: String,
-    },
-    category: {
-        type: String,
-        required: true
-    },
-    tags: {
-        type: [String], // Added by admin after review
-        default: []
+    activity: {
+        total_likes: {
+            type: Number,
+            default: 0
+        },
+        total_reads: {
+            type: Number,
+            default: 0
+        },
     },
     status: {
         type: String,
-        enum: ['draft', 'under review', 'published'],
+        enum: ['draft', 'published'],
         default: 'draft'
     },
-    saved: {
-        type: Number,
-        default: 0
-    },
-    views: {
-        type: Number,
-        default: 0 
-    },
-    reports: [
-        {
-            user: { type: Schema.Types.ObjectId, ref: 'users' }, // Reference to the user who reported
-            message: { type: String, required: true }, // Report reason/message
-            createdAt: { type: Date, default: Date.now }
-        }
-    ],
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
+
+
+}, {
+    timestamps: {
+        createdAt: 'publishedAt'
     }
 });
+
 
 export default mongoose.model('blogs', blogSchema)

@@ -23,6 +23,14 @@ import BlogComingSoon from './user/pages/blog-page';
 import Store from './user/pages/store';
 import MyFavourite from './user/pages/my-favourite';
 import NotFound from './user/pages/not-found';
+import PrivacyPolicy from './user/legal/policy';
+import TermsAndConditions from './user/legal/terms';
+import CookiePolicy from './user/legal/cookie';
+import ScrollToTop from './user/hooks/scroll-top';
+import Blogs from './admin/pages/blogs';
+import BlogEditor from './admin/pages/blog-editor';
+import BlogDetails from './admin/pages/blog-details';
+import EditBlog from './admin/components/edit-blog';
 
 export const UserContext = createContext({});
 export const AdminContext = createContext({});
@@ -47,8 +55,9 @@ function App() {
           onLoaderFinished={() => setProgress(0)}
           className="z-50"
         />
-        <Routes>
 
+        <ScrollToTop />
+        <Routes>
           <Route path='/' element={<NavbarComponent />}>
             <Route path='' element={<HomePage setProgress={setProgress} />} />
             <Route path='/profile/:id' element={<ProfilePage setProgress={setProgress} />} />
@@ -58,17 +67,27 @@ function App() {
             <Route path='/:username/:postId' element={<PostDetails setProgress={setProgress} />} />
             <Route path='/limelight' element={<Feature setProgress={setProgress} />} />
             <Route path='/blog' element={<BlogComingSoon />} />
-            <Route path='/my favourites' element={<MyFavourite setProgress={setProgress}/>}/>
+            <Route path='/my favourites' element={<MyFavourite setProgress={setProgress} />} />
             <Route path='/store' element={<Store setProgress={setProgress} />} />
             <Route path='/not-found' element={<NotFound setProgress={setProgress} />} />
+            <Route path='/policy' element={<PrivacyPolicy setProgress={setProgress} />} />
+            <Route path='/terms' element={<TermsAndConditions setProgress={setProgress} />} />
+            <Route path='/cookies' element={<CookiePolicy setProgress={setProgress} />} />
+
           </Route>
           <Route path='/admin-auth' element={<AdminHome setProgress={setProgress} />} />
           <Route path='/admin/' element={<AdminSidebar setProgress={setProgress} />}>
             <Route path='add-category' element={<AddCategory setProgress={setProgress} />} />
+
             <Route path='dashboard' element={<AdminDashboard setProgress={setProgress} />} />
             <Route path='posts' element={<AdminPost setProgress={setProgress} />} />
+            <Route path='blogs' element={<Blogs setProgress={setProgress} />} />
+            <Route path='write-blog' element={<BlogEditor setProgress={setProgress} />} />
+            <Route path='blog/edit/:blogId' element={<EditBlog setProgress={setProgress}/>}/>
+
             <Route path='users' element={<AllUserShown setProgress={setProgress} />} />
             <Route path='posts/:username/:postId' element={<AdminPostDetails setProgress={setProgress} />} />
+            <Route path='blogs/:blogId' element={<BlogDetails setProgress={setProgress} />} />
           </Route>
         </Routes>
       </AdminContext.Provider>

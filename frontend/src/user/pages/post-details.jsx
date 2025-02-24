@@ -423,7 +423,7 @@ function PostDetails(props) {
                     <div>
                       <motion.nav initial={false} animate={exportReactOpen ? "open" : "closed"} className="relative ">
                         <motion.button
-                          className={`flex items-center bg-[#212121] hover:bg-[#2a2a2a] transition-colors h-[42px] py-0 px-1 rounded-full pl-3 font-semibold ${
+                          className={`flex items-center bg-[#212121] gap-2 hover:bg-[#2a2a2a] transition-colors h-[42px] py-0 px-1 rounded-full pl-3 font-semibold ${
                             exportReactOpen && "bg-[#2a2a2a]"
                           }`}
                           whileTap={{ scale: 0.97 }}
@@ -444,7 +444,7 @@ function PostDetails(props) {
                             transition={{ duration: 0.2 }}
                             style={{ originY: 0.5 }}
                             onClick={() => setExportReactOpen(!exportReactOpen)}
-                            className="hover:bg-[#3a3a3a] rounded-full "
+                            className="hover:bg-[#3a3a3a] rounded "
                           >
                             <ChevronDown size={20} />
                           </motion.div>

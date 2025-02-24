@@ -81,7 +81,7 @@ export function GlobeDemo() {
   return (
     <div 
       ref={containerRef}
-      className="w-full h-full relative overflow-auto flex items-center justify-center"
+      className="w-full h-full relative overflow-y-hidden flex items-center justify-center"
       onWheel={handleWheel}
       onTouchMove={handleTouchMove}
       onTouchEnd={() => {

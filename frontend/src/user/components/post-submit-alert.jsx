@@ -102,7 +102,7 @@ function PostSubmitAlert({
           <div className=" grid grid-cols-button w-full md:w-1/2">
             <div className="pointer-events-none">
               <article
-                className="card flex flex-col text-black h-full z-10 group bg-transparent"
+                className="card flex flex-col text-black h-full z-10 group bg-transparent max-w-[512px]"
                 style={{ opacity: 1, willChange: "auto", transform: "none" }}
               >
                 <div className="card-content flex-grow ">

@@ -1,8 +1,63 @@
 @import "@flaticon/flaticon-uicons/css/all/all";
 
+/* index.css or a separate CSS file */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Override Tailwind's base styles for the Tiptap editor */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose p {
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+/* Ensure the editor content has the correct styles */
+
+.prose ul {
+  list-style-type: disc; 
+  margin-left: 1.5rem; 
+}
+
+.prose ol {
+  list-style-type: decimal; 
+  margin-left: 1.5rem; 
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+}
+
+.prose h1 {
+  font-size: 2em;
+  font-weight: bold;
+}
+
+.prose h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.prose h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+}
+
+.prose h4 {
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.prose p {
+  font-size: 1em;
+  line-height: 1.5;
+}
 
 @layer utilities {
   .animate-fade-in {

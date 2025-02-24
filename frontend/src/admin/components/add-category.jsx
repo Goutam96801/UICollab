@@ -134,30 +134,29 @@ export default function AddCategory(props) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-dark-700 mx-auto p-6 h-[100vh] w-[calc(100vw-250px)] overflow-y-auto"
+      className="bg-gradient-to-br from-gray-900 to-gray-800 mx-auto p-6 h-[100vh] w-[calc(100vw-250px)] overflow-y-auto"
     >
       <Toaster />
       <div className="max-h-[calc(100vh-10rem)] px-4">
         <div className="flex gap-2 mb-2">
-          <div className="w-full">
-            <label className="font-semibold text-gray-400 p-1" htmlFor="name">
-              Name of the category
-            </label>
+          <div className="w-full relative rounded-lg">
             <input
               type="text"
-              name="name"
               id="name"
               onChange={(e) => {
                 setName(e.target.value);
               }}
-              className="p-2 rounded w-full outline-none bg-[#3a3a3a] focus:bg-[#212121] duration-300 placeholder:text-gray-400/50 font-semibold"
-              placeholder="Category name should be unique"
+              className="peer w-full bg-gray-900 outline-none px-4 py-2 text-base rounded-lg border-b border-l border-r border-gray-600 focus:shadow-md"
             />
+            <label
+              className=" font-semibold absolute top-1/2 translate-y-[-50%] peer-focus:bg-transparent left-4 peer-focus:top-0 opacity-70 peer-focus:left-3 text-base peer-focus:text-sm peer-focus:text-[#fff] peer-valid:-top-0 peer-valid:left-3 peer-valid:text-sm  duration-150"
+              htmlFor="name"
+            >
+              Name of category<span className="text-red-500">*</span>
+            </label>
           </div>
           <div className="w-full relative">
-            <label className="font-semibold text-gray-400 p-1" htmlFor="icon">
-              Icon from lucid-react
-            </label>
+            
             <div className="flex">
               <input
                 type="text"
@@ -167,10 +166,16 @@ export default function AddCategory(props) {
                 onChange={(e) => {
                   setIcon(e.target.value);
                 }}
-                className="p-2 rounded w-full outline-none bg-[#3a3a3a] focus:bg-[#212121] duration-300 placeholder:text-gray-400/50 font-semibold"
+                className="peer w-full bg-gray-900 outline-none px-4 py-2 text-base rounded-lg border-b border-l border-r border-gray-600 focus:shadow-md"
                 placeholder="e.g., CheckIcon for <CheckIcon />"
               />
-              <div className="absolute right-0 top-8 px-1 border-l-2 border-gray-400/40 duration-300 transition-all">
+               <label
+              className=" font-semibold absolute top-1/2 translate-y-[-50%] peer-focus:bg-transparent left-4 peer-focus:top-0 opacity-70 peer-focus:left-3 text-base peer-focus:text-sm peer-focus:text-[#fff] peer-valid:-top-0 peer-valid:left-3 peer-valid:text-sm  duration-150"
+              htmlFor="name"
+            >
+              Icon from lucide-react<span className="text-red-500">*</span>
+            </label>
+              <div className="absolute right-0 top-2 px-1 border-l-2 border-gray-400/40 duration-300 transition-all">
                 {icon ? (
                   getIconComponent(icon) || (
                     <span className="text-red-500">Invalid Icon</span>

@@ -48,6 +48,7 @@ function NavbarComponent() {
   const [isCreate, setIsCreate] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [profile, setProfile] = useState(null)
   const dropdownRef = useRef(null);
   const contributorRef = useRef(null);
   const notificationRef = useRef(null);
@@ -58,7 +59,6 @@ function NavbarComponent() {
       access_token,
       username,
       profile_img,
-      contributor_points,
       fullname,
     },
     setUserAuth,
@@ -105,6 +105,25 @@ function NavbarComponent() {
     }
   };
 
+  const fetchUserProfile = () => {
+    axios
+      .post(
+        process.env.REACT_APP_SERVER_DOMAIN + "/get-logged-user",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      )
+      .then(({ data: user }) => {
+        setProfile(user);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -137,6 +156,7 @@ function NavbarComponent() {
           }));
     };
     fetchNotificationCount();
+    fetchUserProfile();
   }, [access_token]);
 
   useEffect(() => {
@@ -269,7 +289,7 @@ function NavbarComponent() {
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
                 <BadgeCent className="text-teal-400" />{" "}
-                <p className="ml-2 font-medium">{contributor_points}</p>
+                <p className="ml-2 font-medium">{profile?.account_info?.contributor_points}</p>
                 {contributor && <ContributorPoint />}
               </motion.div>
               <div>
@@ -282,7 +302,7 @@ function NavbarComponent() {
                   onClick={() => setNotificationOpen(!notificationOpen)}
                   className={`flex cursor-pointer items-center rounded-full  px-4 py-2.5 ${
                     notificationOpen
-                      ? "bg-gradient-to-b from-purple-400 to-teal-400"
+                      ? " drop-shadow-sm shadow-sm shadow-teal-400 "
                       : ""
                   }`}
                 >
@@ -422,9 +442,9 @@ function NavbarComponent() {
                   </button>
                 </motion.li>
                 <motion.li variants={itemVariants} whileHover={{ scale: 1.1 }}>
-                  <button
+                  <Link
                     target="_blank"
-                    rel="noopener noreferrer"
+                    to="https://discord.com/channels/1332911649023066175/1332911649987887195"
                     className="hover:text-gray-100 px-5 pl-3 py-2 flex items-center justify-start w-full text-center text-sm font-medium my-1 rounded-[6px] text-gray-300 hover:bg-[#4955d6] bg-[#5865f2] transition-all duration-300"
                   >
                     <svg
@@ -441,7 +461,7 @@ function NavbarComponent() {
                       />
                     </svg>
                     <span>Join us on Discord</span>
-                  </button>
+                  </Link>
                 </motion.li>
                 <motion.li variants={itemVariants} whileHover={{ scale: 1.1 }}>
                   <button

@@ -1,4 +1,4 @@
-import { Box, Globe, Layers, Zap } from "lucide-react"
+import {  Globe, Layers, Zap } from "lucide-react"
 import { useContext, useEffect, useState } from "react"
 import { Link, Navigate } from "react-router-dom"
 import { AdminContext } from "../../App"
@@ -6,7 +6,7 @@ import AdminAuthentication from "../components/admin-authentication";
 
 export default function AdminHome() {
 
-    let { adminAuth: {access_token}, setAdminAuth} = useContext(AdminContext);
+    let { adminAuth: {access_token}} = useContext(AdminContext);
   const [authOpen, setAuthOpen] = useState(false);
 
   useEffect(() => {
